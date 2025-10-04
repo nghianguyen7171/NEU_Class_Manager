@@ -14,7 +14,7 @@ A simple, functional web application that allows students to look up their midte
 
 The application connects to a Supabase database with the following structure:
 
-**Table:** `DS_Thurs_7_8_Midterm`
+**Table:** `DS_Thurs _7_8_Midterm.csv`
 
 | Column | Description |
 |--------|-------------|
@@ -31,12 +31,23 @@ The application connects to a Supabase database with the following structure:
    npm install
    ```
 
-3. Start the development server:
+3. Create environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Then edit `.env.local` with your Supabase credentials:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. Start the development server:
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Deployment on Vercel
 
@@ -53,8 +64,8 @@ The application connects to a Supabase database with the following structure:
    ```
 
 3. Set environment variables in Vercel dashboard:
-   - `NEXT_PUBLIC_SUPABASE_URL`: https://asxhozsfmlmsrflmzizr.supabase.co
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzeGhvenNmbWxtc3JmbG16aXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Njc2OTAsImV4cCI6MjA3NTE0MzY5MH0.EpsZVx-IPkH078KCeW-YCI_RWhs46LrgbujalXvf48Q
+   - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
 ### Option 2: Deploy via GitHub
 

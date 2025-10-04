@@ -50,6 +50,7 @@
 │   └── components/
 │       └── ConnectionTest.tsx    # Database connection testing
 ├── .env.local                    # Environment variables
+├── .env.example                  # Environment template
 ├── .gitignore                    # Git ignore rules
 ├── vercel.json                   # Vercel deployment config
 ├── package.json                  # Dependencies and scripts
