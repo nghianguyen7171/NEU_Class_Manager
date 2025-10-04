@@ -1,4 +1,5 @@
 {
+  "name": "neu-class-manager",
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
