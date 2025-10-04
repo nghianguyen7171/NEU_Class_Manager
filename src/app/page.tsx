@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase, ExamScore } from '@/lib/supabase'
 import ConnectionTest from '@/components/ConnectionTest'
+import DatabaseDebugger from '@/components/DatabaseDebugger'
 
 export default function Home() {
   const [studentName, setStudentName] = useState('')
@@ -26,26 +27,63 @@ export default function Home() {
     setResult(null)
 
     try {
-      const { data, error: queryError } = await supabase
+      // Try multiple search strategies
+      let searchResult = null
+      let searchError = null
+      
+      // Strategy 1: Exact match with trimmed values
+      const exactResult = await supabase
         .from('DS_Thurs _7_8_Midterm.csv')
         .select('*')
         .eq('Tên', studentName.trim())
         .eq('MSV', parseInt(studentId.trim()))
         .single()
+      
+      if (!exactResult.error && exactResult.data) {
+        searchResult = exactResult.data
+      } else {
+        // Strategy 2: Try with MSV as string
+        const stringResult = await supabase
+          .from('DS_Thurs _7_8_Midterm.csv')
+          .select('*')
+          .eq('Tên', studentName.trim())
+          .eq('MSV', studentId.trim())
+          .single()
+        
+        if (!stringResult.error && stringResult.data) {
+          searchResult = stringResult.data
+        } else {
+          // Strategy 3: Case-insensitive name search
+          const caseInsensitiveResult = await supabase
+            .from('DS_Thurs _7_8_Midterm.csv')
+            .select('*')
+            .ilike('Tên', `%${studentName.trim()}%`)
+            .eq('MSV', parseInt(studentId.trim()))
+            .single()
+          
+          if (!caseInsensitiveResult.error && caseInsensitiveResult.data) {
+            searchResult = caseInsensitiveResult.data
+          } else {
+            searchError = exactResult.error || stringResult.error || caseInsensitiveResult.error
+          }
+        }
+      }
 
-      if (queryError) {
-        if (queryError.code === 'PGRST116') {
+      if (searchError) {
+        if (searchError.code === 'PGRST116') {
           // No rows returned
           setNotFound(true)
-        } else if (queryError.message.includes('Could not find the table')) {
-          console.error('Table not found error:', queryError)
+        } else if (searchError.message.includes('Could not find the table')) {
+          console.error('Table not found error:', searchError)
           setError('Database table not accessible. Please contact administrator.')
         } else {
-          console.error('Supabase error:', queryError)
+          console.error('Supabase error:', searchError)
           setError('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại.')
         }
-      } else if (data) {
-        setResult(data)
+      } else if (searchResult) {
+        setResult(searchResult)
+      } else {
+        setNotFound(true)
       }
     } catch (err) {
       console.error('Unexpected error:', err)
@@ -78,6 +116,9 @@ export default function Home() {
 
         {/* Connection Test */}
         <ConnectionTest />
+
+        {/* Database Debugger */}
+        <DatabaseDebugger />
 
         {/* Search Form */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
