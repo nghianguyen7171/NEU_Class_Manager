@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { supabase, ExamScore } from '@/lib/supabase'
 import ConnectionTest from '@/components/ConnectionTest'
-import DatabaseDebugger from '@/components/DatabaseDebugger'
 
 export default function Home() {
   const [studentName, setStudentName] = useState('')
@@ -116,9 +115,6 @@ export default function Home() {
 
         {/* Connection Test */}
         <ConnectionTest />
-
-        {/* Database Debugger */}
-        <DatabaseDebugger />
 
         {/* Search Form */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
