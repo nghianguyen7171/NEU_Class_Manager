@@ -14,7 +14,7 @@ export default function ConnectionTest() {
     try {
       // Test basic connection
       const { error } = await supabase
-        .from('DS_Thurs_7_8_Midterm')
+        .from('DS_Thurs _7_8_Midterm.csv')
         .select('count')
         .limit(1)
 

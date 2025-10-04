@@ -27,10 +27,10 @@ export default function Home() {
 
     try {
       const { data, error: queryError } = await supabase
-        .from('DS_Thurs_7_8_Midterm')
+        .from('DS_Thurs _7_8_Midterm.csv')
         .select('*')
         .eq('Tên', studentName.trim())
-        .eq('MSV', studentId.trim())
+        .eq('MSV', parseInt(studentId.trim()))
         .single()
 
       if (queryError) {

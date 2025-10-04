@@ -7,7 +7,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export interface ExamScore {
   Tên: string
-  MSV: string
-  'Số câu đúng': number
-  'Điểm': number
+  MSV: number
+  'Số câu đúng': string
+  'Điểm': string
 }
