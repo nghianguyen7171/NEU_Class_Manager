@@ -10,7 +10,7 @@
 ## 🎯 Core Features
 
 - ✅ Multi-class exam score lookup system
-- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 7-8)
+- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6)
 - ✅ Student search by name (Tên) and student ID (MSV)
 - ✅ Dynamic table querying based on selected class
 - ✅ Real-time database query with Supabase
@@ -79,7 +79,7 @@
 - **Table Name:** `DS_Thurs _7_8_Midterm.csv`
 
 ### Database Schema
-**Table 1:** `DS_Thurs _7_8_Midterm.csv` (Thứ 4, tiết 7-8)
+**Table 1:** `DS_Thurs _7_8_Midterm.csv` (Thứ 5, tiết 7-8)
 ```sql
 create table public."DS_Thurs _7_8_Midterm.csv" (
   "Tên" text null,
@@ -90,7 +90,7 @@ create table public."DS_Thurs _7_8_Midterm.csv" (
 ) TABLESPACE pg_default;
 ```
 
-**Table 2:** `DS_Wed _5_6_Midterm.csv` (Thứ 5, tiết 7-8)
+**Table 2:** `DS_Wed _5_6_Midterm.csv` (Thứ 4, tiết 5-6)
 ```sql
 create table public."DS_Wed _5_6_Midterm.csv" (
   "Tên" text null,
@@ -198,12 +198,13 @@ npm run lint         # Code linting
 ## 🔧 Recent Changes & Fixes
 
 ### Latest Updates
-1. **Implemented multi-class system** - Added class selection dropdown for different exam tables
-2. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
-3. **Multi-table connection testing** - ConnectionTest now tests all available tables
-4. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
-5. **Enhanced results display** - Better visual hierarchy with card-based layout
-6. **Updated documentation** - Comprehensive backup context for future AI sessions
+1. **Fixed table mapping** - Corrected class-to-table mapping (Thứ 5, tiết 7-8 → DS_Thurs _7_8_Midterm.csv)
+2. **Updated page title** - Changed browser tab from "Create Next App" to "NEU Class Manager - Tra Cứu Điểm Thi"
+3. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
+4. **Multi-table connection testing** - ConnectionTest now tests all available tables
+5. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
+6. **Enhanced results display** - Better visual hierarchy with card-based layout
+7. **Updated documentation** - Comprehensive backup context for future AI sessions
 
 ### Search Strategies Implemented
 1. Exact match with trimmed values

@@ -10,6 +10,7 @@ A modern, responsive web application that allows students to look up their midte
 - ⚡ **Real-time Queries**: Instant results from Supabase database
 - 🎨 **Professional UI**: Modern design with enhanced accessibility
 - 🔧 **Connection Testing**: Built-in database connectivity diagnostics
+- 🌐 **Vietnamese Language**: Full Vietnamese text support with proper page title
 
 ## Data Source
 
