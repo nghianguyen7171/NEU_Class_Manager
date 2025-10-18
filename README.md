@@ -16,7 +16,7 @@ A modern, responsive web application that allows students to look up their midte
 The application connects to a Supabase database with multiple exam score tables:
 
 **Table 1:** `DS_Wed _5_6_Midterm.csv` (Thứ 5, tiết 7-8)
-**Table 2:** `DS_Thurs _7_8_Midterm.csv` (Thứ 4, tiết 7-8)
+**Table 2:** `DS_Thurs _7_8_Midterm.csv` (Thứ 4, tiết 5-6)
 
 | Column | Description |
 |--------|-------------|
