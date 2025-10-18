@@ -19,8 +19,8 @@ export default function ConnectionTest() {
     setTestResults([])
     
     const tablesToTest = [
-      { name: 'DS_Wed _5_6_Midterm.csv', displayName: 'Thứ 5, tiết 7-8' },
-      { name: 'DS_Thurs _7_8_Midterm.csv', displayName: 'Thứ 4, tiết 5-6' }
+      { name: 'DS_Thurs _7_8_Midterm.csv', displayName: 'Thứ 5, tiết 7-8' },
+      { name: 'DS_Wed _5_6_Midterm.csv', displayName: 'Thứ 4, tiết 5-6' }
     ]
 
     const results: TableTestResult[] = []

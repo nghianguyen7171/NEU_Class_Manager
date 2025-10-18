@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 export default function DataInspector() {
   const [inspecting, setInspecting] = useState(false)
   const [tableData, setTableData] = useState<Record<string, unknown>[]>([])
-  const [selectedTable, setSelectedTable] = useState('DS_Wed _5_6_Midterm.csv')
+  const [selectedTable, setSelectedTable] = useState('DS_Thurs _7_8_Midterm.csv')
 
   const inspectTable = async () => {
     setInspecting(true)
@@ -49,8 +49,8 @@ export default function DataInspector() {
           onChange={(e) => setSelectedTable(e.target.value)}
           className="w-full px-4 py-2 border border-yellow-300 rounded-lg bg-white text-gray-900"
         >
-          <option value="DS_Wed _5_6_Midterm.csv">DS_Wed _5_6_Midterm.csv (Thứ 5, tiết 7-8)</option>
-          <option value="DS_Thurs _7_8_Midterm.csv">DS_Thurs _7_8_Midterm.csv (Thứ 4, tiết 5-6)</option>
+          <option value="DS_Thurs _7_8_Midterm.csv">DS_Thurs _7_8_Midterm.csv (Thứ 5, tiết 7-8)</option>
+          <option value="DS_Wed _5_6_Midterm.csv">DS_Wed _5_6_Midterm.csv (Thứ 4, tiết 5-6)</option>
         </select>
       </div>
 
