@@ -5,6 +5,7 @@ import { supabase, ExamScore } from '@/lib/supabase'
 import ConnectionTest from '@/components/ConnectionTest'
 
 export default function Home() {
+  const [selectedClass, setSelectedClass] = useState('Thứ 5, tiết 7-8')
   const [studentName, setStudentName] = useState('')
   const [studentId, setStudentId] = useState('')
   const [result, setResult] = useState<ExamScore | null>(null)
@@ -12,11 +13,22 @@ export default function Home() {
   const [error, setError] = useState('')
   const [notFound, setNotFound] = useState(false)
 
+  // Class to table mapping
+  const CLASS_TABLE_MAPPING = {
+    'Thứ 5, tiết 7-8': 'DS_Wed _5_6_Midterm.csv',
+    'Thứ 4, tiết 7-8': 'DS_Thurs _7_8_Midterm.csv'
+  }
+
+  // Helper function to get table name from class
+  const getTableName = (className: string): string => {
+    return CLASS_TABLE_MAPPING[className as keyof typeof CLASS_TABLE_MAPPING] || 'DS_Wed _5_6_Midterm.csv'
+  }
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!studentName.trim() || !studentId.trim()) {
-      setError('Vui lòng nhập đầy đủ tên và mã số sinh viên')
+    if (!selectedClass || !studentName.trim() || !studentId.trim()) {
+      setError('Vui lòng chọn lớp học và nhập đầy đủ thông tin')
       return
     }
 
@@ -26,13 +38,16 @@ export default function Home() {
     setResult(null)
 
     try {
+      // Get the table name based on selected class
+      const tableName = getTableName(selectedClass)
+      
       // Try multiple search strategies
       let searchResult = null
       let searchError = null
       
       // Strategy 1: Exact match with trimmed values
       const exactResult = await supabase
-        .from('DS_Thurs _7_8_Midterm.csv')
+        .from(tableName)
         .select('*')
         .eq('Tên', studentName.trim())
         .eq('MSV', parseInt(studentId.trim()))
@@ -43,7 +58,7 @@ export default function Home() {
       } else {
         // Strategy 2: Try with MSV as string
         const stringResult = await supabase
-          .from('DS_Thurs _7_8_Midterm.csv')
+          .from(tableName)
           .select('*')
           .eq('Tên', studentName.trim())
           .eq('MSV', studentId.trim())
@@ -54,7 +69,7 @@ export default function Home() {
         } else {
           // Strategy 3: Case-insensitive name search
           const caseInsensitiveResult = await supabase
-            .from('DS_Thurs _7_8_Midterm.csv')
+            .from(tableName)
             .select('*')
             .ilike('Tên', `%${studentName.trim()}%`)
             .eq('MSV', parseInt(studentId.trim()))
@@ -93,6 +108,7 @@ export default function Home() {
   }
 
   const handleReset = () => {
+    setSelectedClass('Thứ 5, tiết 7-8')
     setStudentName('')
     setStudentId('')
     setResult(null)
@@ -101,15 +117,15 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3 leading-tight">
             🔍 Tra Cứu Điểm Thi
           </h1>
-          <p className="text-gray-600">
-            Nhập tên và mã số sinh viên để tra cứu điểm thi giữa kỳ
+          <p className="text-gray-700 text-lg">
+            Chọn lớp học và nhập thông tin để tra cứu điểm thi giữa kỳ
           </p>
         </div>
 
@@ -117,10 +133,28 @@ export default function Home() {
         <ConnectionTest />
 
         {/* Search Form */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <form onSubmit={handleSearch} className="space-y-4">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8 mb-8">
+          <form onSubmit={handleSearch} className="space-y-6">
+            {/* Class Selection */}
             <div>
-              <label htmlFor="studentName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="classSelect" className="block text-sm font-semibold text-gray-800 mb-2">
+                Lớp học *
+              </label>
+              <select
+                id="classSelect"
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white hover:border-gray-400 transition-colors"
+                disabled={loading}
+                aria-label="Chọn lớp học"
+              >
+                <option value="Thứ 5, tiết 7-8">Thứ 5, tiết 7-8</option>
+                <option value="Thứ 4, tiết 7-8">Thứ 4, tiết 7-8</option>
+              </select>
+            </div>
+            {/* Student Name */}
+            <div>
+              <label htmlFor="studentName" className="block text-sm font-semibold text-gray-800 mb-2">
                 Tên sinh viên *
               </label>
               <input
@@ -128,14 +162,16 @@ export default function Home() {
                 id="studentName"
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white disabled:bg-gray-100 disabled:text-gray-600"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-600 transition-colors"
                 placeholder="Nhập họ tên đầy đủ"
                 disabled={loading}
+                aria-label="Nhập tên sinh viên"
               />
             </div>
             
+            {/* Student ID */}
             <div>
-              <label htmlFor="studentId" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="studentId" className="block text-sm font-semibold text-gray-800 mb-2">
                 Mã số sinh viên *
               </label>
               <input
@@ -143,17 +179,19 @@ export default function Home() {
                 id="studentId"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white disabled:bg-gray-100 disabled:text-gray-600"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white hover:border-gray-400 disabled:bg-gray-100 disabled:text-gray-600 transition-colors"
                 placeholder="Nhập mã số sinh viên"
                 disabled={loading}
+                aria-label="Nhập mã số sinh viên"
               />
             </div>
 
-            <div className="flex gap-3">
+            {/* Action Buttons */}
+            <div className="flex gap-4 pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -171,7 +209,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium"
               >
                 Làm mới
               </button>
@@ -181,7 +219,7 @@ export default function Home() {
 
         {/* Results */}
         {(result || notFound || error) && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8">
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-md p-4">
                 <div className="flex">
@@ -215,30 +253,30 @@ export default function Home() {
             )}
 
             {result && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-6">
-                <h3 className="text-lg font-semibold text-green-800 mb-4 text-center">
-                  Kết quả tìm kiếm
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-8">
+                <h3 className="text-2xl font-bold text-green-800 mb-6 text-center">
+                  🎉 Kết quả tìm kiếm
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">✅</span>
+                <div className="space-y-4">
+                  <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
+                    <span className="text-3xl mr-4">✅</span>
                     <div>
-                      <span className="text-sm font-medium text-gray-700">Tên:</span>
-                      <span className="ml-2 font-semibold text-green-800">{result.Tên}</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Tên sinh viên:</span>
+                      <p className="text-lg font-bold text-green-800 mt-1">{result.Tên}</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">🎯</span>
+                  <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
+                    <span className="text-3xl mr-4">🎯</span>
                     <div>
-                      <span className="text-sm font-medium text-gray-700">Số câu đúng:</span>
-                      <span className="ml-2 font-semibold text-green-800">{result['Số câu đúng']}</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Số câu đúng:</span>
+                      <p className="text-lg font-bold text-green-800 mt-1">{result['Số câu đúng']}</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">🧾</span>
+                  <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
+                    <span className="text-3xl mr-4">🧾</span>
                     <div>
-                      <span className="text-sm font-medium text-gray-700">Điểm:</span>
-                      <span className="ml-2 font-semibold text-green-800 text-xl">{result['Điểm']}</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Điểm số:</span>
+                      <p className="text-2xl font-bold text-green-800 mt-1">{result['Điểm']}</p>
                     </div>
                   </div>
                 </div>

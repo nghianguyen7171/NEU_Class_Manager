@@ -9,13 +9,17 @@
 
 ## 🎯 Core Features
 
+- ✅ Multi-class exam score lookup system
+- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 7-8)
 - ✅ Student search by name (Tên) and student ID (MSV)
+- ✅ Dynamic table querying based on selected class
 - ✅ Real-time database query with Supabase
-- ✅ Clean, responsive UI with TailwindCSS
+- ✅ Professional, responsive UI with enhanced styling
 - ✅ Vietnamese text support with UTF-8 encoding
-- ✅ Error handling and loading states
-- ✅ Connection testing capabilities
+- ✅ Comprehensive error handling and loading states
+- ✅ Multi-table connection testing capabilities
 - ✅ High contrast input fields for better visibility
+- ✅ Accessibility features (ARIA labels, keyboard navigation)
 
 ## 🛠️ Technology Stack
 
@@ -75,6 +79,7 @@
 - **Table Name:** `DS_Thurs _7_8_Midterm.csv`
 
 ### Database Schema
+**Table 1:** `DS_Thurs _7_8_Midterm.csv` (Thứ 4, tiết 7-8)
 ```sql
 create table public."DS_Thurs _7_8_Midterm.csv" (
   "Tên" text null,
@@ -82,6 +87,17 @@ create table public."DS_Thurs _7_8_Midterm.csv" (
   "Số câu đúng" text null,
   "Điểm" text null,
   constraint DS_Thurs _7_8_Midterm.csv_pkey primary key ("MSV")
+) TABLESPACE pg_default;
+```
+
+**Table 2:** `DS_Wed _5_6_Midterm.csv` (Thứ 5, tiết 7-8)
+```sql
+create table public."DS_Wed _5_6_Midterm.csv" (
+  "Tên" text null,
+  "MSV" bigint not null,
+  "Số câu đúng" text null,
+  "Điểm" text null,
+  constraint DS_Wed _5_6_Midterm.csv_pkey primary key ("MSV")
 ) TABLESPACE pg_default;
 ```
 
@@ -182,12 +198,12 @@ npm run lint         # Code linting
 ## 🔧 Recent Changes & Fixes
 
 ### Latest Updates
-1. **Fixed database table name** - Changed from `DS_Thurs_7_8_Midterm` to `DS_Thurs _7_8_Midterm.csv`
-2. **Corrected data types** - MSV as number, scores as strings
-3. **Enhanced search algorithm** - Multiple search strategies for better matching
-4. **Improved input contrast** - Fixed white text visibility issue in some browsers
-5. **Removed debug components** - Cleaned up production interface
-6. **Added comprehensive error handling** - Better user experience
+1. **Implemented multi-class system** - Added class selection dropdown for different exam tables
+2. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
+3. **Multi-table connection testing** - ConnectionTest now tests all available tables
+4. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
+5. **Enhanced results display** - Better visual hierarchy with card-based layout
+6. **Updated documentation** - Comprehensive backup context for future AI sessions
 
 ### Search Strategies Implemented
 1. Exact match with trimmed values
@@ -197,13 +213,15 @@ npm run lint         # Code linting
 ## 🎨 UI/UX Features
 
 ### Design Elements
-- Gradient background (blue to indigo)
-- Card-based layout with shadows
-- Emoji-enhanced results display
-- Responsive design for mobile/desktop
-- High contrast input fields
-- Loading states with spinners
-- Professional error messages
+- Enhanced gradient background (blue-100 via indigo-50 to purple-100)
+- Professional card-based layout with enhanced shadows
+- Emoji-enhanced results display with better visual hierarchy
+- Responsive design optimized for mobile/desktop
+- High contrast input fields with hover/focus states
+- Loading states with animated spinners
+- Professional error messages with color-coded status
+- Class selection dropdown with smooth transitions
+- Enhanced typography with better font weights and spacing
 
 ### Vietnamese Text Support
 - UTF-8 encoding throughout

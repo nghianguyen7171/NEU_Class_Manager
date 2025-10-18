@@ -1,20 +1,22 @@
 # Exam Score Lookup Website
 
-A simple, functional web application that allows students to look up their midterm exam scores from a Supabase database.
+A modern, responsive web application that allows students to look up their midterm exam scores from multiple classes. Built with Next.js, TypeScript, and Supabase.
 
 ## Features
 
-- 🔍 Search by student name and student ID
-- 📊 Display exam results with correct answers count and final score
-- 🎨 Clean, responsive UI built with TailwindCSS
-- ⚡ Fast and secure connection to Supabase
-- 🚀 Ready for Vercel deployment
+- 🎯 **Multi-Class Support**: Select from different exam classes
+- 🔍 **Student Search**: Look up scores by name and student ID
+- 📱 **Responsive Design**: Works perfectly on mobile and desktop
+- ⚡ **Real-time Queries**: Instant results from Supabase database
+- 🎨 **Professional UI**: Modern design with enhanced accessibility
+- 🔧 **Connection Testing**: Built-in database connectivity diagnostics
 
 ## Data Source
 
-The application connects to a Supabase database with the following structure:
+The application connects to a Supabase database with multiple exam score tables:
 
-**Table:** `DS_Thurs _7_8_Midterm.csv`
+**Table 1:** `DS_Wed _5_6_Midterm.csv` (Thứ 5, tiết 7-8)
+**Table 2:** `DS_Thurs _7_8_Midterm.csv` (Thứ 4, tiết 7-8)
 
 | Column | Description |
 |--------|-------------|
@@ -84,10 +86,12 @@ The following environment variables are required:
 
 ## Usage
 
-1. Enter the student's full name (Tên)
-2. Enter the student ID (MSV)
-3. Click "Tìm kiếm" (Search)
-4. View the results showing:
+1. **Select Class**: Choose from available exam classes
+2. **Enter Student Information**: 
+   - Student's full name (Tên)
+   - Student ID (MSV)
+3. **Search**: Click "Tìm kiếm" (Search)
+4. **View Results**: See the exam results showing:
    - ✅ Student name
    - 🎯 Number of correct answers
    - 🧾 Final score
