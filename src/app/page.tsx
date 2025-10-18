@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { supabase, ExamScore } from '@/lib/supabase'
 import ConnectionTest from '@/components/ConnectionTest'
-import DataInspector from '@/components/DataInspector'
 
 export default function Home() {
   const [selectedClass, setSelectedClass] = useState('Thứ 5, tiết 7-8')
@@ -42,17 +41,11 @@ export default function Home() {
       // Get the table name based on selected class
       const tableName = getTableName(selectedClass)
       
-      // Debug logging
-      console.log('Searching in table:', tableName)
-      console.log('Student name:', studentName.trim())
-      console.log('Student ID:', studentId.trim())
-      
       // Try multiple search strategies
       let searchResult = null
       let searchError = null
       
       // Strategy 1: Exact match with trimmed values
-      console.log('Trying Strategy 1: Exact match')
       const exactResult = await supabase
         .from(tableName)
         .select('*')
@@ -60,13 +53,10 @@ export default function Home() {
         .eq('MSV', parseInt(studentId.trim()))
         .single()
       
-      console.log('Strategy 1 result:', exactResult)
-      
       if (!exactResult.error && exactResult.data) {
         searchResult = exactResult.data
       } else {
         // Strategy 2: Try with MSV as string
-        console.log('Trying Strategy 2: MSV as string')
         const stringResult = await supabase
           .from(tableName)
           .select('*')
@@ -74,21 +64,16 @@ export default function Home() {
           .eq('MSV', studentId.trim())
           .single()
         
-        console.log('Strategy 2 result:', stringResult)
-        
         if (!stringResult.error && stringResult.data) {
           searchResult = stringResult.data
         } else {
           // Strategy 3: Case-insensitive name search
-          console.log('Trying Strategy 3: Case-insensitive search')
           const caseInsensitiveResult = await supabase
             .from(tableName)
             .select('*')
             .ilike('Tên', `%${studentName.trim()}%`)
             .eq('MSV', parseInt(studentId.trim()))
             .single()
-          
-          console.log('Strategy 3 result:', caseInsensitiveResult)
           
           if (!caseInsensitiveResult.error && caseInsensitiveResult.data) {
             searchResult = caseInsensitiveResult.data
@@ -99,7 +84,6 @@ export default function Home() {
       }
 
       if (searchError) {
-        console.log('Search error:', searchError)
         if (searchError.code === 'PGRST116') {
           // No rows returned
           setNotFound(true)
@@ -111,10 +95,8 @@ export default function Home() {
           setError('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại.')
         }
       } else if (searchResult) {
-        console.log('Search result found:', searchResult)
         setResult(searchResult)
       } else {
-        console.log('No result and no error - this should not happen')
         setNotFound(true)
       }
     } catch (err) {
@@ -149,9 +131,6 @@ export default function Home() {
 
         {/* Connection Test */}
         <ConnectionTest />
-        
-        {/* Data Inspector - Debug Tool */}
-        <DataInspector />
 
         {/* Search Form */}
         <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8 mb-8">
