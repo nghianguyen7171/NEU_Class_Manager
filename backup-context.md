@@ -5,7 +5,7 @@
 **Project Name:** Exam Score Lookup Website  
 **Purpose:** A web application that allows students to look up their midterm exam scores from a Supabase database  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** October 2025  
+**Last Updated:** October 18, 2025  
 
 ## 🎯 Core Features
 
