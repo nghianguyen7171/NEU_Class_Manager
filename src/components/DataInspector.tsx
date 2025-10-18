@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 
 export default function DataInspector() {
   const [inspecting, setInspecting] = useState(false)
-  const [tableData, setTableData] = useState<any[]>([])
+  const [tableData, setTableData] = useState<Record<string, unknown>[]>([])
   const [selectedTable, setSelectedTable] = useState('DS_Wed _5_6_Midterm.csv')
 
   const inspectTable = async () => {
