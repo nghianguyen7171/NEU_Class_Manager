@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NEU Class Manager - Tra Cứu Điểm Thi",
+  title: "NEU Class Manager",
   description: "Hệ thống tra cứu điểm thi giữa kỳ cho sinh viên NEU. Chọn lớp học và nhập thông tin để tra cứu điểm thi.",
 };
 
