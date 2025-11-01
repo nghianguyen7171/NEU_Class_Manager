@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getTestVersion } from '@/lib/examGenerator'
 import { saveExamResponse, getExamResponse } from '@/lib/examStorage'
 import type { ShuffledQuestion } from '@/lib/types'
@@ -137,6 +138,31 @@ export default function ExamPage() {
             >
               ← Về trang chủ
             </Link>
+          </div>
+
+          {/* Logos */}
+          <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 mb-8">
+            <Image
+              src="/logo/NEU logo.png"
+              alt="NEU Logo"
+              width={120}
+              height={120}
+              className="object-contain h-auto"
+            />
+            <Image
+              src="/logo/LogoNCT.png"
+              alt="NCT Logo"
+              width={120}
+              height={120}
+              className="object-contain h-auto"
+            />
+            <Image
+              src="/logo/FDA logo_không nền.png"
+              alt="FDA Logo"
+              width={160}
+              height={160}
+              className="object-contain h-auto"
+            />
           </div>
           
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
