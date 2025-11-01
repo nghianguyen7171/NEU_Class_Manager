@@ -87,23 +87,31 @@ export async function generateFixedTests(): Promise<TestVersion[]> {
       'Điểm': q['Điểm']
     }))
     
-    // Use fixed seed to select 40 questions (same set for all tests)
-    const selectedQuestions = shuffleArray(decodedQuestions, 12345)
-      .slice(0, 40)
+    // Generate 4 test versions with minimal question overlap
+    // Strategy: Each test gets 40 questions from the 87-question pool
+    // Use different shuffle seeds for each version to maximize diversity
+    // With 87 questions and 4 tests of 40 each, overlap is naturally minimized
     
-    // Create questions with A, B, C, D in original order (no shuffling)
-    const baseQuestions = selectedQuestions.map((q, index) => ({
-      ...createQuestion(q),
-      id: index + 1 // Question numbers 1-40
-    }))
-    
-    // Generate 4 test versions - all have same questions in same order
-    // Version differences are for administrative tracking only
     const testVersions: TestVersion[] = []
+    const questionsPerTest = 40
     
+    // Generate 4 test versions with different question sets
     for (let version = 1; version <= 4; version++) {
-      // All versions use the same questions with A-B-C-D in original order
-      testVersions.push(baseQuestions.map(q => ({ ...q })))
+      // Use different seed for each version to get different question order
+      // Version 1: Seed 11000, Version 2: Seed 12000, Version 3: Seed 13000, Version 4: Seed 14000
+      const versionSeed = 10000 + version * 1000
+      const versionShuffled = shuffleArray([...decodedQuestions], versionSeed)
+      
+      // Take first 40 questions for this version
+      const versionQuestions = versionShuffled.slice(0, questionsPerTest)
+      
+      // Create questions with A, B, C, D in original order (no shuffling)
+      const versionTestQuestions = versionQuestions.map((q, index) => ({
+        ...createQuestion(q),
+        id: index + 1 // Question numbers 1-40
+      }))
+      
+      testVersions.push(versionTestQuestions)
     }
     
     // Cache the tests

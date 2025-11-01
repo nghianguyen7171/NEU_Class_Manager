@@ -334,13 +334,10 @@ export default function ExamPage() {
           <div className="p-8">
             <div className="text-center mb-8">
               <div className="inline-block bg-gradient-to-r from-green-100 to-emerald-100 rounded-full p-8 mb-6">
-                <div className="text-5xl font-bold text-green-600 mb-2">
-                  {totalScore.toFixed(2)}
-                </div>
-                <div className="text-gray-600 text-sm">điểm / 10.00 điểm</div>
+                <div className="text-6xl mb-4">✅</div>
               </div>
               
-              <p className="text-gray-700 text-lg mb-4">
+              <p className="text-gray-700 text-lg mb-4 font-semibold">
                 Cảm ơn bạn đã hoàn thành bài kiểm tra!
               </p>
               
@@ -349,13 +346,12 @@ export default function ExamPage() {
                 <p>Họ và tên: {studentName}</p>
                 <p>MSV: {studentId}</p>
                 <p>Đề thi số: {testVersion}</p>
-                <p>Số câu trả lời đúng: {Math.round(totalScore * 4)} / 40</p>
               </div>
             </div>
             
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-600 text-center">
-                Kết quả đã được lưu vào hệ thống. Bạn có thể kiểm tra điểm số tại trang tra cứu điểm thi.
+                Bài làm của bạn đã được lưu vào hệ thống. Kết quả sẽ được công bố sau.
               </p>
             </div>
             
