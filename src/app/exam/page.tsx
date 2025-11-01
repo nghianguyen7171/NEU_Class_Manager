@@ -214,6 +214,7 @@ export default function ExamPage() {
                       placeholder="Nhập họ và tên của bạn"
                       disabled={loading}
                       required
+                      autoComplete="off"
                     />
                   </div>
                   
@@ -230,6 +231,7 @@ export default function ExamPage() {
                       placeholder="Nhập MSV của bạn"
                       disabled={loading}
                       required
+                      autoComplete="off"
                     />
                   </div>
                   

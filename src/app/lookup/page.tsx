@@ -220,6 +220,7 @@ export default function LookupPage() {
                 placeholder="Nhập họ tên đầy đủ"
                 disabled={loading}
                 aria-label="Nhập tên sinh viên"
+                autoComplete="off"
               />
             </div>
             
@@ -237,6 +238,7 @@ export default function LookupPage() {
                 placeholder="Nhập mã số sinh viên"
                 disabled={loading}
                 aria-label="Nhập mã số sinh viên"
+                autoComplete="off"
               />
             </div>
 
