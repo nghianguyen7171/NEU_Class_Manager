@@ -18,8 +18,8 @@ function shuffleArray<T>(array: T[], seed: number): T[] {
   return shuffled
 }
 
-// Shuffle choices for a single question
-function shuffleChoices(question: Question, seed: number): ShuffledQuestion {
+// Create question with choices in original A, B, C, D order (no shuffling)
+function createQuestion(question: Question): ShuffledQuestion {
   const choices = [
     { letter: 'A', text: question['Lựa chọn A'] },
     { letter: 'B', text: question['Lựa chọn B'] },
@@ -27,23 +27,16 @@ function shuffleChoices(question: Question, seed: number): ShuffledQuestion {
     { letter: 'D', text: question['Lựa chọn D'] }
   ]
   
-  // Shuffle the choices
-  const shuffled = shuffleArray(choices, seed)
-  
-  // Find the new position of the correct answer
-  const originalCorrectLetter = question['Đáp án đúng']
-  const originalCorrectChoice = choices.find(c => c.letter === originalCorrectLetter)
-  const shuffledCorrectAnswer = shuffled.find(
-    c => c.text === originalCorrectChoice?.text
-  )?.letter || originalCorrectLetter
+  // Keep choices in original A, B, C, D order
+  const correctAnswer = question['Đáp án đúng']
   
   return {
     id: 0, // Will be set when questions are assembled
     text: question['Text đáp án'],
-    choices: shuffled.map(c => c.text),
-    originalCorrectAnswer: originalCorrectLetter,
-    shuffledCorrectAnswer,
-    displayChoices: shuffled.map(c => ({ letter: c.letter, text: c.text }))
+    choices: choices.map(c => c.text),
+    originalCorrectAnswer: correctAnswer,
+    shuffledCorrectAnswer: correctAnswer, // Same as original since we don't shuffle
+    displayChoices: choices.map(c => ({ letter: c.letter, text: c.text }))
   }
 }
 
@@ -98,20 +91,19 @@ export async function generateFixedTests(): Promise<TestVersion[]> {
     const selectedQuestions = shuffleArray(decodedQuestions, 12345)
       .slice(0, 40)
     
-    // Generate 4 test versions with different shuffle seeds
+    // Create questions with A, B, C, D in original order (no shuffling)
+    const baseQuestions = selectedQuestions.map((q, index) => ({
+      ...createQuestion(q),
+      id: index + 1 // Question numbers 1-40
+    }))
+    
+    // Generate 4 test versions - all have same questions in same order
+    // Version differences are for administrative tracking only
     const testVersions: TestVersion[] = []
     
     for (let version = 1; version <= 4; version++) {
-      const versionSeed = version * 1000 + version // 1001, 2002, 3003, 4004
-      const shuffledQuestions = selectedQuestions.map((q, index) => {
-        const shuffled = shuffleChoices(q, versionSeed + index)
-        return {
-          ...shuffled,
-          id: index + 1 // Question numbers 1-40
-        }
-      })
-      
-      testVersions.push(shuffledQuestions)
+      // All versions use the same questions with A-B-C-D in original order
+      testVersions.push(baseQuestions.map(q => ({ ...q })))
     }
     
     // Cache the tests
