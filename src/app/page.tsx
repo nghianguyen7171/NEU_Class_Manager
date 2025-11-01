@@ -5,9 +5,23 @@ import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen relative">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/bg.jpg"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+      </div>
+      
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative z-10 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           {/* Logos Section */}
           <div className="flex flex-col items-center justify-center mb-12">

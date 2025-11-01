@@ -128,8 +128,23 @@ export default function ExamPage() {
   // Render Phase 1: Entry form
   if (!examStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+      <div className="min-h-screen relative">
+        {/* Background Image */}
+        <div className="fixed inset-0 z-0">
+          <Image
+            src="/bg.jpg"
+            alt="Background"
+            fill
+            className="object-cover"
+            priority
+            quality={90}
+          />
+          {/* Overlay for readability */}
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+        </div>
+        
+        <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
           {/* Navigation */}
           <div className="mb-6">
             <Link
@@ -237,14 +252,30 @@ export default function ExamPage() {
           </div>
         </div>
       </div>
+    </div>
     )
   }
 
   // Render Phase 2: Exam interface
   if (!examSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen relative">
+        {/* Background Image */}
+        <div className="fixed inset-0 z-0">
+          <Image
+            src="/bg.jpg"
+            alt="Background"
+            fill
+            className="object-cover"
+            priority
+            quality={90}
+          />
+          {/* Overlay for readability */}
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+        </div>
+        
+        <div className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -338,17 +369,33 @@ export default function ExamPage() {
               <p className="text-center text-sm text-gray-600 mt-4">
                 Đã trả lời: {Object.keys(studentAnswers).length} / 40 câu hỏi
               </p>
-            </div>
           </div>
         </div>
+        </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   // Render Phase 3: Completion screen
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen relative">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/bg.jpg"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+      </div>
+      
+      <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 px-8 py-12 text-center">
             <div className="text-6xl mb-4">✅</div>
@@ -388,6 +435,7 @@ export default function ExamPage() {
               Về trang chủ
             </Link>
           </div>
+        </div>
         </div>
       </div>
     </div>

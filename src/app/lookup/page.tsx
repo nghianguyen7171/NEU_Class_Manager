@@ -120,8 +120,23 @@ export default function LookupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen relative">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src="/bg.jpg"
+          alt="Background"
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+        />
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+      </div>
+      
+      <div className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
         {/* Navigation */}
         <div className="mb-6">
           <Link
@@ -323,6 +338,7 @@ export default function LookupPage() {
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   )
