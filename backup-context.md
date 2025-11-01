@@ -5,16 +5,17 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** January 2025  
+**Last Updated:** January 2025 (Latest: Logo update, text contrast, autocomplete disable)  
 
 ## 🎯 Core Features
 
 ### Score Lookup System
 - ✅ Multi-class exam score lookup
-- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6)
+- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6 / Thứ 6, tiết 1-2)
 - ✅ Student search by name (Tên) and student ID (MSV)
 - ✅ Dynamic table querying based on selected class
 - ✅ Real-time database query with Supabase
+- ✅ Browser autocomplete disabled for privacy
 
 ### Online Exam System
 - ✅ Randomized 40-question selection from 87-question bank
@@ -32,7 +33,9 @@
 - ✅ High contrast input fields for better visibility
 - ✅ Accessibility features (ARIA labels, keyboard navigation)
 - ✅ Navigation between score lookup and exam pages
-- ✅ Custom background image (bg.jpg) applied to all pages with semi-transparent overlay for readability
+- ✅ Custom background image (bg.jpg) applied to all pages with semi-transparent overlay (30% opacity) for readability
+- ✅ High-contrast white background container for main page text with shadows and blur effects
+- ✅ Browser autocomplete disabled for privacy on name and MSV input fields
 
 ## 🛠️ Technology Stack
 
@@ -60,7 +63,9 @@
 /Users/nguyennghia/PROJECT/NEU_CLASS_MANAGER/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx              # Home page (Score Lookup)
+│   │   ├── page.tsx              # Home page with hero section
+│   │   ├── lookup/
+│   │   │   └── page.tsx          # Score lookup page
 │   │   ├── layout.tsx            # App layout
 │   │   ├── globals.css           # Global styles
 │   │   └── exam/
@@ -79,6 +84,13 @@
 ├── package.json                  # Dependencies and scripts
 ├── tailwind.config.ts            # TailwindCSS configuration
 ├── tsconfig.json                 # TypeScript configuration
+├── public/
+│   ├── bg.jpg                    # Background image for all pages
+│   └── logo/
+│       ├── NEU logo.png          # NEU logo
+│       ├── LogoNCT.png           # NCT logo
+│       └── FDA logo_đen nền trắng.png  # FDA logo (white background version)
+├── logo/                         # Source logo folder
 ├── README.md                     # Project documentation
 ├── deploy.md                     # Deployment instructions
 ├── PROJECT_SUMMARY.md            # Project summary
@@ -139,13 +151,21 @@ create table public."DS_Wed _5_6_Midterm.csv" (
 
 ## 💻 Key Code Files
 
-### Main Application (src/app/page.tsx)
+### Home Page (src/app/page.tsx)
 - React component with TypeScript
+- Hero section with high-contrast white background container
+- Logo display (NEU, NCT, FDA) with consistent sizing
+- Feature cards linking to lookup and exam pages
+- Custom background image with overlay
+- Professional styling with shadows and blur effects
+
+### Score Lookup Page (src/app/lookup/page.tsx)
 - Form handling for student name and ID input
 - Multiple search strategies for database queries
 - Error handling and loading states
 - Responsive UI with TailwindCSS
-- Navigation between score lookup and exam pages
+- Browser autocomplete disabled
+- Real-time results display with enhanced visuals
 
 ### Exam Page (src/app/exam/page.tsx)
 - 3-phase exam interface (entry, exam, completion)
@@ -249,12 +269,16 @@ npm run lint         # Code linting
 
 ### Latest Updates
 1. **Fixed table mapping** - Corrected class-to-table mapping (Thứ 5, tiết 7-8 → DS_Thurs _7_8_Midterm.csv)
-2. **Updated page title** - Changed browser tab from "Create Next App" to "NEU Class Manager - Tra Cứu Điểm Thi"
+2. **Updated page title** - Changed browser tab to "NEU Class Manager" (simplified from "NEU Class Manager - Tra Cứu Điểm Thi")
 3. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
-4. **Multi-table connection testing** - ConnectionTest now tests all available tables
+4. **Multi-table connection testing** - ConnectionTest now tests all available tables (including DS_Fri_1_2_Midterm.csv)
 5. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
 6. **Enhanced results display** - Better visual hierarchy with card-based layout
-7. **Updated documentation** - Comprehensive backup context for future AI sessions
+7. **Background image** - Added bg.jpg with 30% opacity overlay for better visibility
+8. **Text contrast enhancement** - Increased text darkness (text-gray-900) with shadows for readability
+9. **Logo updates** - Replaced FDA logo_không nền.png with FDA logo_đen nền trắng.png
+10. **Privacy features** - Disabled browser autocomplete on name and MSV input fields
+11. **Updated documentation** - Comprehensive backup context for future AI sessions
 
 ### Search Strategies Implemented
 1. Exact match with trimmed values
@@ -264,15 +288,18 @@ npm run lint         # Code linting
 ## 🎨 UI/UX Features
 
 ### Design Elements
-- Enhanced gradient background (blue-100 via indigo-50 to purple-100)
+- Custom background image (bg.jpg) with 30% white overlay and subtle backdrop blur
+- High-contrast white background container for main page text (95% opacity with blur)
 - Professional card-based layout with enhanced shadows
 - Emoji-enhanced results display with better visual hierarchy
 - Responsive design optimized for mobile/desktop
-- High contrast input fields with hover/focus states
+- High contrast input fields with hover/focus states (text-gray-900)
+- Enhanced text with drop shadows and text shadows for visibility
 - Loading states with animated spinners
 - Professional error messages with color-coded status
 - Class selection dropdown with smooth transitions
-- Enhanced typography with better font weights and spacing
+- Enhanced typography with better font weights (font-bold, font-semibold, font-extrabold)
+- Browser autocomplete disabled on sensitive input fields
 
 ### Vietnamese Text Support
 - UTF-8 encoding throughout
@@ -363,10 +390,33 @@ This backup context contains all essential information for AI sessions:
 - **Background Image Implementation**: Added `bg.jpg` as background image to all pages (home, lookup, exam)
   - Copied `bg.jpg` from `logo/` folder to `public/` folder for Next.js access
   - Applied fixed background image with Next.js `Image` component using `fill` prop
-  - Added semi-transparent white overlay (`bg-white/80`) with backdrop blur for text readability
+  - Added semi-transparent white overlay (`bg-white/30`) with subtle backdrop blur (`blur-[2px]`) for better background visibility
   - Updated all three pages: `src/app/page.tsx`, `src/app/lookup/page.tsx`, `src/app/exam/page.tsx`
   - Fixed div structure issues in exam page (Phase 1, 2, and 3 sections)
-  - Deployed to Vercel successfully
+  - Reduced overlay opacity from 80% to 30% for better background image visibility
+
+- **Text Contrast Enhancement**: Improved text readability against background
+  - Updated all text colors to darker shades (`text-gray-900`, `text-gray-800`)
+  - Added text shadows and drop shadows to headings and important text
+  - Increased font weights (font-bold, font-semibold, font-extrabold)
+  - Enhanced main page text with white background container (`bg-white/95`) with backdrop blur and shadows
+  - Applied across all pages: home, lookup, exam (all phases)
+
+- **Logo Update**: Replaced FDA logo version
+  - Changed from `FDA logo_không nền.png` to `FDA logo_đen nền trắng.png` (white background version)
+  - Updated in all pages: home (`src/app/page.tsx`), lookup (`src/app/lookup/page.tsx`), exam (`src/app/exam/page.tsx`)
+  - Copied new logo file to `public/logo/` directory
+  - All logos maintain 150x150 pixel size consistency
+
+- **Page Title Update**: Simplified browser tab title
+  - Changed from "NEU Class Manager - Tra Cứu Điểm Thi" to "NEU Class Manager"
+  - Updated in `src/app/layout.tsx` metadata
+
+- **Privacy Enhancement**: Disabled browser autocomplete
+  - Added `autoComplete="off"` attribute to all name and MSV input fields
+  - Prevents browser from showing cached previous values
+  - Applied to lookup page (studentName, studentId) and exam page (name, id)
+  - Improves privacy and prevents confusion from autofill suggestions
 
 ### December 2024
 - **Homepage Redesign**: Moved score lookup to `/lookup` sub-page, created new home page with hero section
