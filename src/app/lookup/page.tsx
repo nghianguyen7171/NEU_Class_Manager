@@ -164,7 +164,7 @@ export default function LookupPage() {
             className="object-contain h-auto"
           />
           <Image
-            src="/logo/FDA logo_không nền.png"
+            src="/logo/FDA logo_đen nền trắng.png"
             alt="FDA Logo"
             width={150}
             height={150}

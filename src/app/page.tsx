@@ -53,7 +53,7 @@ export default function Home() {
               {/* FDA Logo */}
               <div className="flex-shrink-0">
                 <Image
-                  src="/logo/FDA logo_không nền.png"
+                  src="/logo/FDA logo_đen nền trắng.png"
                   alt="FDA Logo"
                   width={150}
                   height={150}
@@ -66,15 +66,17 @@ export default function Home() {
 
           {/* Main Content */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-md">
-              NEU Class Manager
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-900 mb-4 font-semibold">
-              Hệ thống quản lý lớp học và thi cử trực tuyến
-            </p>
-                <p className="text-lg text-gray-800 max-w-2xl mx-auto font-medium">
-              Công cụ hỗ trợ sinh viên tra cứu điểm thi và thực hiện bài kiểm tra giữa kỳ một cách thuận tiện và hiệu quả
-            </p>
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 md:p-12 max-w-4xl mx-auto border-2 border-gray-200">
+              <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-lg [text-shadow:_2px_2px_4px_rgb(0_0_0_/_30%)]">
+                NEU Class Manager
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-900 mb-4 font-bold [text-shadow:_1px_1px_2px_rgb(0_0_0_/_20%)]">
+                Hệ thống quản lý lớp học và thi cử trực tuyến
+              </p>
+              <p className="text-lg text-gray-900 max-w-2xl mx-auto font-semibold [text-shadow:_1px_1px_2px_rgb(0_0_0_/_15%)]">
+                Công cụ hỗ trợ sinh viên tra cứu điểm thi và thực hiện bài kiểm tra giữa kỳ một cách thuận tiện và hiệu quả
+              </p>
+            </div>
           </div>
 
           {/* Feature Cards */}
