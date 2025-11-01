@@ -46,17 +46,6 @@ Text đáp án,Lựa chọn A,Lựa chọn B,Lựa chọn C,Lựa chọn D,Đáp
 "Hàm nào được sử dụng để kiểm tra chuỗi có chứa một ký tự trong Pandas?","str.contains()","str.find()","str.match()","str.search()","A",1
 "LabelEncoder dùng để:","Mã hóa biến phân loại thành số","Tạo dummy variables","Chuẩn hóa dữ liệu số","Xử lý dữ liệu thiếu","A",1
 "One-Hot Encoding (get_dummies) tạo ra bao nhiêu cột cho một biến có 4 giá trị duy nhất?","1","2","3","4","D",1
-"MultiIndex trong Pandas là gì?","Index nhiều cấp","Index lặp lại","Index không sắp xếp","Index ngẫu nhiên","A",1
-"Kết quả của df.set_index(['A', 'B']) là:","Tạo MultiIndex từ 2 cột A và B","Xóa 2 cột A và B","Đổi tên cột A và B","Lỗi","A",1
-"loc[(1, 4)] trong DataFrame có MultiIndex lấy gì?","Hàng có A=1 hoặc B=4","Hàng có A=1 và B=4","Hàng có A=1","Hàng có B=4","B",1
-"Kết quả của pd.merge(df1, df2, on='key') với inner join là:","Giữ tất cả hàng từ df1","Giữ tất cả hàng từ df2","Chỉ giữ hàng có key chung","Giữ tất cả hàng từ cả 2","C",1
-"how='left' trong pd.merge() có nghĩa là:","Giữ tất cả hàng từ DataFrame bên trái","Giữ tất cả hàng từ DataFrame bên phải","Giữ hàng có key chung","Giữ tất cả hàng từ cả 2","A",1
-"pd.concat([df1, df2]) mặc định nối theo trục nào?","axis=0 (theo hàng)","axis=1 (theo cột)","axis=2","axis=3","A",1
-"pd.concat([df1, df2], axis=1) nối theo trục nào?","axis=0 (theo hàng)","axis=1 (theo cột)","axis=2","axis=3","B",1
-"melt() trong Pandas chuyển đổi dữ liệu từ dạng nào?","Wide sang Long","Long sang Wide","Vertical sang Horizontal","Horizontal sang Vertical","A",1
-"pivot() trong Pandas chuyển đổi dữ liệu từ dạng nào?","Wide sang Long","Long sang Wide","Vertical sang Horizontal","Horizontal sang Vertical","B",1
-"stack() trong Pandas làm gì?","Chuyển columns thành index","Chuyển index thành columns","Xoay DataFrame 90 độ","Không có hàm stack()","A",1
-"unstack() trong Pandas làm gì?","Chuyển columns thành index","Chuyển index thành columns","Xoay DataFrame 90 độ","Không có hàm unstack()","B",1
 "Kết quả của df = pd.DataFrame({'A': [1, 2, 3, 4, 5]}); print(df.fillna(0) khi df không có NaN)?","[1, 2, 3, 4, 5]","[0, 0, 0, 0, 0]","Lỗi","DataFrame không đổi","D",1
 "Bạn muốn tạo một mảng NumPy chứa các số từ 0 đến 9. Code nào sau đây phù hợp nhất?","np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])","np.arange(10)","np.zeros(10)","np.ones(10)","B",1
 "Bạn muốn tính tổng tất cả các phần tử trong một mảng NumPy arr. Code nào sau đây phù hợp nhất?","sum(arr)","arr.sum()","np.total(arr)","arr.add()","B",1
@@ -74,14 +63,6 @@ Text đáp án,Lựa chọn A,Lựa chọn B,Lựa chọn C,Lựa chọn D,Đáp
 "Bạn muốn tách chuỗi ký tự trong cột 'text' theo khoảng trắng. Code nào sau đây phù hợp nhất?","df['text'].str.split()","df['text'].split()","pd.split(df['text'])","str.split(df['text'])","A",1
 "Bạn muốn mã hóa các giá trị phân loại ['red', 'blue', 'green'] thành số [0, 1, 2]. Code nào sau đây phù hợp nhất?","from sklearn.preprocessing import LabelEncoder; le = LabelEncoder(); le.fit_transform(['red', 'blue', 'green'])","df['color'].map({'red': 0, 'blue': 1, 'green': 2})","df['color'].to_numeric()","pd.encode(df['color'])","A",1
 "Bạn muốn tạo dummy variables (One-Hot Encoding) cho cột 'color' trong DataFrame df. Code nào sau đây phù hợp nhất?","pd.get_dummies(df['color'])","df['color'].get_dummies()","pd.one_hot(df['color'])","df['color'].encode_one_hot()","A",1
-"Bạn muốn tạo MultiIndex từ 2 cột 'A' và 'B' trong DataFrame df. Code nào sau đây phù hợp nhất?","df.set_index(['A', 'B'])","df.index = ['A', 'B']","df.multiindex(['A', 'B'])","pd.MultiIndex(df[['A', 'B']])","A",1
-"Bạn muốn merge 2 DataFrame df1 và df2 theo cột 'key' giữ tất cả hàng từ df1. Code nào sau đây phù hợp nhất?","pd.merge(df1, df2, on='key', how='left')","df1.merge(df2, on='key', how='left')","pd.join(df1, df2, on='key')","pd.merge(df1, df2, on='key')","A",1
-"Bạn muốn nối 2 DataFrame theo hàng (row-wise concatenation). Code nào sau đây phù hợp nhất?","pd.concat([df1, df2], axis=0)","pd.concat([df1, df2])","df1.append(df2)","df1.concat(df2)","B",1
-"Bạn muốn chuyển DataFrame từ dạng wide sang long format. Code nào sau đây phù hợp nhất?","df.melt(id_vars=['id'])","df.pivot()","df.stack()","df.reshape('long')","A",1
-"Bạn muốn chuyển DataFrame từ dạng long sang wide format. Code nào sau đây phù hợp nhất?","df.pivot(index='id', columns='variable', values='value')","df.melt()","df.unstack()","df.reshape('wide')","A",1
-"Bạn muốn stack columns thành index trong DataFrame df. Code nào sau đây phù hợp nhất?","df.stack()","df.melt()","df.pivot()","df.reshape()","A",1
 "Bạn muốn apply một function cho mỗi hàng trong DataFrame df. Code nào sau đây phù hợp nhất?","df.apply(function, axis=1)","df.map(function)","df.transform(function)","df.foreach(function)","A",1
 "Bạn muốn group by theo cột 'category' và tính tổng cho cột 'value'. Code nào sau đây phù hợp nhất?","df.groupby('category')['value'].sum()","df.group('category').sum()","df.aggregate('category', 'sum')","pd.groupby_sum(df, 'category', 'value')","A",1
 "Bạn muốn lọc các hàng có giá trị cột 'A' &gt; 10 trong DataFrame df. Code nào sau đây phù hợp nhất?","df[df['A'] &gt; 10]","df.filter(df['A'] &gt; 10)","df.where(df['A'] &gt; 10)","pd.filter(df, 'A', '&gt;', 10)","A",1
-"Bạn muốn sắp xếp DataFrame df theo cột 'A' giảm dần. Code nào sau đây phù hợp nhất?","df.sort_values('A', ascending=False)","df.order('A', desc=True)","df.sorted('A', reverse=True)","pd.sort(df, 'A', descending=True)","A",1
-"Bạn muốn reset index sau khi chuyển 1 cột thành index trong DataFrame df. Code nào sau đây phù hợp nhất?","df.reset_index()","df.reindex()","df.index_reset()","pd.reset(df)","A",1

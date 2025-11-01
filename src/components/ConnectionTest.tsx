@@ -20,7 +20,8 @@ export default function ConnectionTest() {
     
     const tablesToTest = [
       { name: 'DS_Thurs _7_8_Midterm.csv', displayName: 'Thứ 5, tiết 7-8' },
-      { name: 'DS_Wed _5_6_Midterm.csv', displayName: 'Thứ 4, tiết 5-6' }
+      { name: 'DS_Wed _5_6_Midterm.csv', displayName: 'Thứ 4, tiết 5-6' },
+      { name: 'DS_Fri_1_2_Midterm.csv', displayName: 'Thứ 6, tiết 1-2 (Kết quả thi online)' }
     ]
 
     const results: TableTestResult[] = []
