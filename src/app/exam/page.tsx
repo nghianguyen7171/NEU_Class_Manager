@@ -145,22 +145,22 @@ export default function ExamPage() {
             <Image
               src="/logo/NEU logo.png"
               alt="NEU Logo"
-              width={120}
-              height={120}
+              width={150}
+              height={150}
               className="object-contain h-auto"
             />
             <Image
               src="/logo/LogoNCT.png"
               alt="NCT Logo"
-              width={120}
-              height={120}
+              width={150}
+              height={150}
               className="object-contain h-auto"
             />
             <Image
               src="/logo/FDA logo_không nền.png"
               alt="FDA Logo"
-              width={160}
-              height={160}
+              width={150}
+              height={150}
               className="object-contain h-auto"
             />
           </div>

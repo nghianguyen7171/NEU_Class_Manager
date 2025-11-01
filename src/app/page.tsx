@@ -41,8 +41,8 @@ export default function Home() {
                 <Image
                   src="/logo/FDA logo_không nền.png"
                   alt="FDA Logo"
-                  width={200}
-                  height={200}
+                  width={150}
+                  height={150}
                   className="object-contain h-auto"
                   priority
                 />
@@ -132,41 +132,6 @@ export default function Home() {
             >
               📝 Làm Bài Thi
             </Link>
-          </div>
-
-          {/* Info Section */}
-          <div className="mt-16 bg-white/60 backdrop-blur-sm rounded-2xl p-8 max-w-3xl mx-auto border border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              Hướng dẫn sử dụng
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8 text-left">
-              <div className="flex gap-3">
-                <div className="flex-shrink-0">
-                  <span className="inline-flex w-8 h-8 bg-blue-100 text-blue-600 rounded-full items-center justify-center font-bold text-sm">1</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 mb-2">
-                    Tra Cứu Điểm
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Chọn lớp học, nhập họ tên và mã số sinh viên để xem kết quả điểm thi giữa kỳ
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0">
-                  <span className="inline-flex w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full items-center justify-center font-bold text-sm">2</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-800 mb-2">
-                    Làm Bài Thi
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Nhập thông tin và bắt đầu làm bài kiểm tra 40 câu hỏi trắc nghiệm trực tuyến
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
