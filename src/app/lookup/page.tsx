@@ -177,7 +177,7 @@ export default function LookupPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-3 leading-tight">
             🔍 Tra Cứu Điểm Thi
           </h1>
-          <p className="text-gray-700 text-lg">
+          <p className="text-gray-900 text-lg font-semibold">
             Chọn lớp học và nhập thông tin để tra cứu điểm thi giữa kỳ
           </p>
         </div>
@@ -263,7 +263,7 @@ export default function LookupPage() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium"
+                    className="px-6 py-3 border-2 border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold"
               >
                 Làm mới
               </button>
@@ -315,21 +315,21 @@ export default function LookupPage() {
                   <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
                     <span className="text-3xl mr-4">✅</span>
                     <div>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Tên sinh viên:</span>
+                      <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Tên sinh viên:</span>
                       <p className="text-lg font-bold text-green-800 mt-1">{result.Tên}</p>
                     </div>
                   </div>
                   <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
                     <span className="text-3xl mr-4">🎯</span>
                     <div>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Số câu đúng:</span>
+                      <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Số câu đúng:</span>
                       <p className="text-lg font-bold text-green-800 mt-1">{result['Số câu đúng']}</p>
                     </div>
                   </div>
                   <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
                     <span className="text-3xl mr-4">🧾</span>
                     <div>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Điểm số:</span>
+                      <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Điểm số:</span>
                       <p className="text-2xl font-bold text-green-800 mt-1">{result['Điểm']}</p>
                     </div>
                   </div>

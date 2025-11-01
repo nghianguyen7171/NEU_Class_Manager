@@ -66,13 +66,13 @@ export default function Home() {
 
           {/* Main Content */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight drop-shadow-md">
               NEU Class Manager
             </h1>
-            <p className="text-xl md:text-2xl text-gray-700 mb-4">
+            <p className="text-xl md:text-2xl text-gray-900 mb-4 font-semibold">
               Hệ thống quản lý lớp học và thi cử trực tuyến
             </p>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p className="text-lg text-gray-800 max-w-2xl mx-auto font-medium">
               Công cụ hỗ trợ sinh viên tra cứu điểm thi và thực hiện bài kiểm tra giữa kỳ một cách thuận tiện và hiệu quả
             </p>
           </div>
@@ -93,7 +93,7 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
                   Tra Cứu Điểm Thi
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-800 mb-4 font-medium">
                   Tìm kiếm và xem kết quả điểm thi giữa kỳ nhanh chóng và chính xác
                 </p>
                 <div className="inline-flex items-center text-blue-600 font-semibold group-hover:text-blue-700">
@@ -119,7 +119,7 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
                   Làm Bài Thi
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-800 mb-4 font-medium">
                   Thực hiện bài kiểm tra giữa kỳ trực tuyến với giao diện thân thiện và dễ sử dụng
                 </p>
                 <div className="inline-flex items-center text-indigo-600 font-semibold group-hover:text-indigo-700">
@@ -153,8 +153,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-600 mb-2">© 2024 NEU Class Manager</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-gray-900 mb-2 font-semibold">© 2024 NEU Class Manager</p>
+          <p className="text-sm text-gray-800 font-medium">
             Hệ thống quản lý lớp học và thi cử - Trường Đại học Kinh tế Quốc dân
           </p>
         </div>

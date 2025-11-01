@@ -202,7 +202,7 @@ export default function ExamPage() {
               <form onSubmit={handleStartExam}>
                 <div className="space-y-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-sm font-semibold text-gray-900 mb-2">
                       Họ và tên
                     </label>
                     <input
@@ -218,7 +218,7 @@ export default function ExamPage() {
                   </div>
                   
                   <div>
-                    <label htmlFor="id" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="id" className="block text-sm font-semibold text-gray-900 mb-2">
                       MSV (Mã số sinh viên)
                     </label>
                     <input
@@ -280,8 +280,8 @@ export default function ExamPage() {
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Kiểm tra Giữa Kỳ</h2>
-                <p className="text-gray-600 mt-1">
+                <h2 className="text-xl font-bold text-gray-900">Kiểm tra Giữa Kỳ</h2>
+                <p className="text-gray-800 mt-1 font-medium">
                   {studentName} - MSV: {studentId} - Đề thi số {testVersion}
                 </p>
               </div>
@@ -306,10 +306,10 @@ export default function ExamPage() {
                     <span className="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold mr-2">
                       Câu {question.id}
                     </span>
-                    <span className="text-gray-600 text-sm">(0.25 điểm)</span>
+                    <span className="text-gray-800 text-sm font-medium">(0.25 điểm)</span>
                   </div>
                   
-                  <p className="text-gray-800 text-lg mb-4 font-medium">
+                  <p className="text-gray-900 text-lg mb-4 font-semibold">
                     {question.text}
                   </p>
                   
@@ -338,7 +338,7 @@ export default function ExamPage() {
                             <span className="font-semibold text-gray-800 mr-2">
                               {choice.letter}.)
                             </span>
-                            <span className="text-gray-700">
+                            <span className="text-gray-900 font-medium">
                               {choice.text}
                             </span>
                           </div>
@@ -366,7 +366,7 @@ export default function ExamPage() {
                 {loading ? 'Đang nộp bài...' : '✅ Nộp bài'}
               </button>
               
-              <p className="text-center text-sm text-gray-600 mt-4">
+              <p className="text-center text-sm text-gray-800 mt-4 font-medium">
                 Đã trả lời: {Object.keys(studentAnswers).length} / 40 câu hỏi
               </p>
           </div>
@@ -410,7 +410,7 @@ export default function ExamPage() {
                 <div className="text-6xl mb-4">✅</div>
               </div>
               
-              <p className="text-gray-700 text-lg mb-4 font-semibold">
+              <p className="text-gray-900 text-lg mb-4 font-bold">
                 Cảm ơn bạn đã hoàn thành bài kiểm tra!
               </p>
               
@@ -423,7 +423,7 @@ export default function ExamPage() {
             </div>
             
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-600 text-center">
+              <p className="text-sm text-gray-800 text-center font-medium">
                 Bài làm của bạn đã được lưu vào hệ thống. Kết quả sẽ được công bố sau.
               </p>
             </div>
