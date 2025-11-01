@@ -1,25 +1,37 @@
-# Backup Context - NEU Class Manager Exam Score Lookup
+# Backup Context - NEU Class Manager
 
 ## 📋 Project Overview
 
-**Project Name:** Exam Score Lookup Website  
-**Purpose:** A web application that allows students to look up their midterm exam scores from a Supabase database  
+**Project Name:** NEU Class Manager  
+**Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** October 18, 2025  
+**Last Updated:** December 2024  
 
 ## 🎯 Core Features
 
-- ✅ Multi-class exam score lookup system
+### Score Lookup System
+- ✅ Multi-class exam score lookup
 - ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6)
 - ✅ Student search by name (Tên) and student ID (MSV)
 - ✅ Dynamic table querying based on selected class
 - ✅ Real-time database query with Supabase
+
+### Online Exam System
+- ✅ Randomized 40-question selection from 87-question bank
+- ✅ 4 fixed test versions with shuffled answer choices
+- ✅ Sequential test version assignment per student
+- ✅ Automatic scoring (0.25 points per correct answer)
+- ✅ Response storage with detailed tracking
+- ✅ One-time access enforcement
+
+### User Interface
 - ✅ Professional, responsive UI with enhanced styling
 - ✅ Vietnamese text support with UTF-8 encoding
 - ✅ Comprehensive error handling and loading states
 - ✅ Multi-table connection testing capabilities
 - ✅ High contrast input fields for better visibility
 - ✅ Accessibility features (ARIA labels, keyboard navigation)
+- ✅ Navigation between score lookup and exam pages
 
 ## 🛠️ Technology Stack
 
@@ -34,6 +46,7 @@
 - **Database:** Supabase (PostgreSQL)
 - **Client:** @supabase/supabase-js v2.58.0
 - **Authentication:** Anonymous access with API keys
+- **Randomization:** seedrandom library for deterministic shuffling
 
 ### Deployment
 - **Platform:** Vercel
@@ -46,11 +59,16 @@
 /Users/nguyennghia/PROJECT/NEU_CLASS_MANAGER/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx              # Main lookup interface
+│   │   ├── page.tsx              # Home page (Score Lookup)
 │   │   ├── layout.tsx            # App layout
-│   │   └── globals.css           # Global styles
+│   │   ├── globals.css           # Global styles
+│   │   └── exam/
+│   │       └── page.tsx          # Exam taking page
 │   ├── lib/
-│   │   └── supabase.ts           # Database client configuration
+│   │   ├── supabase.ts           # Database client configuration
+│   │   ├── types.ts              # TypeScript interfaces
+│   │   ├── examGenerator.ts      # Test generation logic
+│   │   └── examStorage.ts        # Response storage logic
 │   └── components/
 │       └── ConnectionTest.tsx    # Database connection testing
 ├── .env.local                    # Environment variables
@@ -79,6 +97,9 @@
 - **Table Name:** `DS_Thurs _7_8_Midterm.csv`
 
 ### Database Schema
+
+**Score Lookup Tables:**
+
 **Table 1:** `DS_Thurs _7_8_Midterm.csv` (Thứ 5, tiết 7-8)
 ```sql
 create table public."DS_Thurs _7_8_Midterm.csv" (
@@ -101,6 +122,14 @@ create table public."DS_Wed _5_6_Midterm.csv" (
 ) TABLESPACE pg_default;
 ```
 
+**Exam System Tables:**
+
+**Question Bank:** `test_library_lec1_lec6.csv` (87 questions)
+- Columns: Text đáp án, Lựa chọn A, Lựa chọn B, Lựa chọn C, Lựa chọn D, Đáp án đúng, Điểm
+
+**Response Table:** `exam_responses` (created by running supabase_setup.sql)
+- Columns: id, created_at, student_name, student_id, test_version, responses (JSONB), total_score
+
 ### Vercel Deployment
 - **Production URL:** https://neu-class-manager.vercel.app
 - **Project ID:** nghia-nguyens-projects-e8ff0ad6/neu-class-manager
@@ -115,6 +144,14 @@ create table public."DS_Wed _5_6_Midterm.csv" (
 - Multiple search strategies for database queries
 - Error handling and loading states
 - Responsive UI with TailwindCSS
+- Navigation between score lookup and exam pages
+
+### Exam Page (src/app/exam/page.tsx)
+- 3-phase exam interface (entry, exam, completion)
+- 40-question single-scroll layout
+- Automatic scoring with instant results
+- One-time access enforcement
+- Sequential test version assignment
 
 ### Database Client (src/lib/supabase.ts)
 ```typescript
@@ -132,6 +169,18 @@ export interface ExamScore {
   'Điểm': string
 }
 ```
+
+### Exam Generator (src/lib/examGenerator.ts)
+- Fetches 87 questions from Supabase
+- Randomly selects 40 questions using fixed seed
+- Creates 4 test versions with shuffled choices
+- Uses seedrandom for deterministic randomization
+
+### Exam Storage (src/lib/examStorage.ts)
+- Saves student responses to Supabase
+- Calculates scores automatically
+- Stores detailed question-level data
+- Prevents duplicate submissions
 
 ### Connection Test Component (src/components/ConnectionTest.tsx)
 - Database connectivity testing
@@ -246,7 +295,11 @@ npm run lint         # Code linting
 
 ### ✅ Completed
 - Database connection established
-- Search functionality working
+- Score lookup functionality working
+- Online exam system implemented
+- 4 test versions with randomized questions
+- Automatic grading system
+- Response storage to Supabase
 - UI/UX optimized
 - Deployed to production
 - GitHub integration active
@@ -283,7 +336,23 @@ npm run lint         # Code linting
 
 ### Database
 - **Supabase Project:** asxhozsfmlmsrflmzizr
-- **Table:** DS_Thurs _7_8_Midterm.csv
+- **Score Tables:** DS_Thurs _7_8_Midterm.csv, DS_Wed _5_6_Midterm.csv
+- **Exam Tables:** test_library_lec1_lec6.csv, exam_responses
+
+---
+
+## 🤖 AI Readiness Status
+
+**Status:** 100% Ready
+
+This backup context contains all essential information for AI sessions:
+- ✅ Complete project structure
+- ✅ All code file locations and purposes
+- ✅ Database schemas and connections
+- ✅ Deployment information
+- ✅ Feature specifications
+- ✅ Technology stack details
+- ✅ Troubleshooting guidelines
 
 ---
 
