@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { supabase, ExamScore } from '@/lib/supabase'
 import ConnectionTest from '@/components/ConnectionTest'
 
@@ -122,11 +123,27 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-gray-900 mb-3 leading-tight">
-            🔍 Tra Cứu Điểm Thi
+            NEU Class Manager
           </h1>
           <p className="text-gray-700 text-lg">
-            Chọn lớp học và nhập thông tin để tra cứu điểm thi giữa kỳ
+            Hệ thống quản lý lớp học và thi cử
           </p>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-center gap-4 mb-6">
+          <Link
+            href="/"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg"
+          >
+            🔍 Tra Cứu Điểm
+          </Link>
+          <Link
+            href="/exam"
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg"
+          >
+            📝 Làm Bài Thi
+          </Link>
         </div>
 
         {/* Connection Test */}

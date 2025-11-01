@@ -1,0 +1,87 @@
+Text đáp án,Lựa chọn A,Lựa chọn B,Lựa chọn C,Lựa chọn D,Đáp án đúng,Điểm
+"Khoa học dữ liệu (Data Science) là một lĩnh vực liên ngành kết hợp ba trụ cột chính. Trụ cột nào sau đây KHÔNG phải là một trong ba trụ cột đó?","Toán học &amp; Thống kê","Khoa học máy tính","Kiến thức chuyên ngành","Kinh tế học","D",1
+"Trong chu trình khai thác dữ liệu, bước nào liên quan đến việc xác định mục tiêu kinh doanh và yêu cầu dữ liệu?","Thu thập dữ liệu","Xác định bài toán","Khai phá dữ liệu","Xây dựng mô hình","B",1
+"Trong Python, kiểu dữ liệu nào được sử dụng để lưu trữ các phần tử không có thứ tự và không trùng lặp?","list","tuple","dict","set","D",1
+"Kết quả của phép toán sau là gì: 7 // 2?","3.5","3","4","2.5","B",1
+"Kết quả của phép toán sau là gì: 2 ** 3?","5","6","8","9","C",1
+"Trong Python, khi thực hiện phép chia 3 / 2, kiểu dữ liệu của kết quả sẽ là:","int","float","str","bool","B",1
+"Kết quả của đoạn code sau là gì: type(True)?","&lt;class 'bool'&gt;","&lt;class 'int'&gt;","&lt;class 'str'&gt;","&lt;class 'logical'&gt;","A",1
+"Kết quả của đoạn code: 'Python' == 'python' là:","True","False","'True'","Lỗi","B",1
+"Kết quả của đoạn code sau là gì: int('5') + 2?","7","'52'","25","Lỗi","A",1
+"Kết quả của đoạn code: [10, 20, 30][0] là:","10","20","30","Lỗi","A",1
+"Kết quả của đoạn code: (1, 2, 3)[-1] là:","1","2","3","Lỗi","C",1
+"Kết quả của đoạn code sau là gì: {1, 2, 2, 3}?","{1, 2, 3}","{1, 2, 2, 3}","[1, 2, 3]","(1, 2, 3)","A",1
+"Kết quả của đoạn code: 'Python'[::-1] là:","'nohtyP'","'Python'","'Pyth'","Lỗi","A",1
+"Trong Python, list và tuple khác nhau ở điểm nào?","List có thể thay đổi, tuple không thể","List không có thứ tự, tuple có thứ tự","List dùng [], tuple dùng {}","Không có khác biệt","A",1
+"Kết quả của đoạn code: my_list = [1, 2, 3]; my_list[0] = 10; print(my_list)?","[1, 2, 3]","[10, 2, 3]","(10, 2, 3)","Lỗi","B",1
+"Kết quả của đoạn code: lambda x: x**2; print(square(4)) với square = lambda x: x**2; print(square(4))?","8","4","16","Lỗi","C",1
+"NumPy là viết tắt của từ gì?","Number Python","Numerical Python","Native Python","None Python","B",1
+"Trong NumPy, đối tượng nào được sử dụng để lưu trữ mảng đa chiều?","array","ndarray","matrix","vector","B",1
+"Kết quả của np.zeros((2, 3)) là gì?","Mảng 2x3 chứa số 0","Mảng 2x3 chứa số 1","Mảng 2x3 chứa số ngẫu nhiên","Mảng 2x3 trống","A",1
+"Kết quả của đoạn code: arr = np.array([1, 2, 3, 4, 5]); print(arr[2:5])?","[2 3 4]","[2 3 4 5]","[1 2 3 4]","[3 4 5]","D",1
+"Kết quả của đoạn code: arr = np.array([1, 2, 3]); print(arr * 2)?","[1 2 3 1 2 3]","[2 4 6]","[3 4 5]","Lỗi","B",1
+"Kết quả của np.array([[1, 2], [3, 4]]).shape là:","(4,)","(2, 2)","[2, 2]","(1, 4)","B",1
+"Kết quả của arr = np.array([1, 2, 3, 4, 5]); print(arr[arr &gt; 3])?","[4 5]","[True True]","[3 4 5]","[False False False True True]","A",1
+"Kết quả của arr = np.array([1, 2, 3, 4, 5]); print(arr.sum())?","15","15.0","[1 2 3 4 5]","5","A",1
+"Trong Pandas, đối tượng nào được sử dụng để lưu trữ dữ liệu một chiều có nhãn?","DataFrame","Series","Array","List","B",1
+"Kết quả của pd.Series([1, 2, 3, 4]).index là:","[0 1 2 3]","RangeIndex(start=0, stop=4, step=1)","[1 2 3 4]","Index([1, 2, 3, 4])","B",1
+"Trong Pandas, DataFrame có mấy chiều?","1","2","3","4","B",1
+"Kết quả của df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]}); print(df.shape)?","(3, 2)","(2, 3)","(6,)","[3, 2]","A",1
+"Kết quả của df = pd.DataFrame({'A': [1, 2, 3]}); print(type(df['A']))?","&lt;class 'list'&gt;","&lt;class 'pandas.core.series.Series'&gt;","&lt;class 'numpy.ndarray'&gt;","&lt;class 'pandas.core.frame.DataFrame'&gt;","B",1
+"Kết quả của df.loc[0] khi df có 3 hàng là:","Giá trị tại hàng 0, cột đầu tiên","Series chứa tất cả các giá trị của hàng 0","DataFrame chứa hàng 0","Lỗi","B",1
+"Hàm nào trong Pandas được sử dụng để đọc file CSV?","read_csv","read_excel","read_json","read_table","A",1
+"read_csv() mặc định coi dòng đầu tiên là:","Dữ liệu","Header (tên cột)","Index","Chân trang","B",1
+"Khi đọc file CSV không có header, cần sử dụng parameter nào?","header=None","skip_header=True","no_header=True","header=False","A",1
+"Kết quả của df = pd.read_csv('file.csv', index_col='ID') là:","Đọc file và tạo DataFrame mới","Đặt cột ID làm index","Xóa cột ID","Lỗi","B",1
+"Hàm nào được sử dụng để loại bỏ dữ liệu thiếu trong Pandas?","dropna()","fillna()","isna()","notna()","A",1
+"Kết quả của df = pd.DataFrame({'A': [1, None, 3], 'B': [None, 5, 6]}); result = df.dropna(); print(len(result))?","0","1","2","3","B",1
+"Hàm nào được sử dụng để thay thế dữ liệu thiếu trong Pandas?","dropna()","fillna()","isna()","notna()","B",1
+"fillna(method='ffill') có nghĩa là gì?","Forward fill - điền giá trị trước đó","Backward fill - điền giá trị sau","Fill với giá trị trung bình","Fill với số 0","A",1
+"Hàm nào được sử dụng để phát hiện dữ liệu trùng lặp trong Pandas?","duplicated()","drop_duplicates()","unique()","nunique()","A",1
+"Kết quả của df = pd.DataFrame({'A': [1, 2, 2, 3]}); result = df.drop_duplicates(); print(len(result))?","2","3","4","1","B",1
+"MinMaxScaler chuẩn hóa dữ liệu về khoảng nào?","[-1, 1]","[0, 1]","(0, 1)","(-∞, ∞)","B",1
+"StandardScaler chuẩn hóa dữ liệu về mean=0 và std=?","0","0.5","1","2","C",1
+"RobustScaler sử dụng tham số nào để chuẩn hóa dữ liệu?","Mean và std","Median và IQR","Min và max","Mode và range","B",1
+"Kết quả của df['text'].str.upper() trên chuỗi 'hello' là:","'hello'","'HELLO'","'Hello'","'Hello WORLD'","B",1
+"Hàm nào được sử dụng để kiểm tra chuỗi có chứa một ký tự trong Pandas?","str.contains()","str.find()","str.match()","str.search()","A",1
+"LabelEncoder dùng để:","Mã hóa biến phân loại thành số","Tạo dummy variables","Chuẩn hóa dữ liệu số","Xử lý dữ liệu thiếu","A",1
+"One-Hot Encoding (get_dummies) tạo ra bao nhiêu cột cho một biến có 4 giá trị duy nhất?","1","2","3","4","D",1
+"MultiIndex trong Pandas là gì?","Index nhiều cấp","Index lặp lại","Index không sắp xếp","Index ngẫu nhiên","A",1
+"Kết quả của df.set_index(['A', 'B']) là:","Tạo MultiIndex từ 2 cột A và B","Xóa 2 cột A và B","Đổi tên cột A và B","Lỗi","A",1
+"loc[(1, 4)] trong DataFrame có MultiIndex lấy gì?","Hàng có A=1 hoặc B=4","Hàng có A=1 và B=4","Hàng có A=1","Hàng có B=4","B",1
+"Kết quả của pd.merge(df1, df2, on='key') với inner join là:","Giữ tất cả hàng từ df1","Giữ tất cả hàng từ df2","Chỉ giữ hàng có key chung","Giữ tất cả hàng từ cả 2","C",1
+"how='left' trong pd.merge() có nghĩa là:","Giữ tất cả hàng từ DataFrame bên trái","Giữ tất cả hàng từ DataFrame bên phải","Giữ hàng có key chung","Giữ tất cả hàng từ cả 2","A",1
+"pd.concat([df1, df2]) mặc định nối theo trục nào?","axis=0 (theo hàng)","axis=1 (theo cột)","axis=2","axis=3","A",1
+"pd.concat([df1, df2], axis=1) nối theo trục nào?","axis=0 (theo hàng)","axis=1 (theo cột)","axis=2","axis=3","B",1
+"melt() trong Pandas chuyển đổi dữ liệu từ dạng nào?","Wide sang Long","Long sang Wide","Vertical sang Horizontal","Horizontal sang Vertical","A",1
+"pivot() trong Pandas chuyển đổi dữ liệu từ dạng nào?","Wide sang Long","Long sang Wide","Vertical sang Horizontal","Horizontal sang Vertical","B",1
+"stack() trong Pandas làm gì?","Chuyển columns thành index","Chuyển index thành columns","Xoay DataFrame 90 độ","Không có hàm stack()","A",1
+"unstack() trong Pandas làm gì?","Chuyển columns thành index","Chuyển index thành columns","Xoay DataFrame 90 độ","Không có hàm unstack()","B",1
+"Kết quả của df = pd.DataFrame({'A': [1, 2, 3, 4, 5]}); print(df.fillna(0) khi df không có NaN)?","[1, 2, 3, 4, 5]","[0, 0, 0, 0, 0]","Lỗi","DataFrame không đổi","D",1
+"Bạn muốn tạo một mảng NumPy chứa các số từ 0 đến 9. Code nào sau đây phù hợp nhất?","np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])","np.arange(10)","np.zeros(10)","np.ones(10)","B",1
+"Bạn muốn tính tổng tất cả các phần tử trong một mảng NumPy arr. Code nào sau đây phù hợp nhất?","sum(arr)","arr.sum()","np.total(arr)","arr.add()","B",1
+"Bạn muốn tìm giá trị lớn nhất trong mảng NumPy arr. Code nào sau đây phù hợp nhất?","max(arr)","arr.max()","np.maximum(arr)","arr.biggest()","B",1
+"Bạn muốn thay đổi shape của mảng NumPy arr từ (10,) thành (2, 5). Code nào sau đây phù hợp nhất?","arr.shape = (2, 5)","arr.reshape(2, 5)","arr.resize(2, 5)","np.reshape(arr, (2, 5))","B",1
+"Bạn muốn tạo một DataFrame từ dictionary với keys làm tên cột. Code nào sau đây phù hợp nhất?","pd.DataFrame({'A': [1, 2], 'B': [3, 4]})","df = DataFrame({'A': [1, 2]})","pd.Data({'A': [1, 2]})","create_dataframe({'A': [1, 2]})","A",1
+"Bạn muốn chọn hàng có index = 0 và cột có tên 'A' trong DataFrame df. Code nào sau đây phù hợp nhất?","df.loc[0, 'A']","df.iloc[0, 0]","df[0]['A']","df.loc['A', 0]","A",1
+"Bạn muốn đọc file CSV có header và sử dụng dòng đầu tiên làm tên cột. Code nào sau đây phù hợp nhất?","pd.read_csv('file.csv')","pd.read_csv('file.csv', header=0)","pd.read_csv('file.csv', names=['col1', 'col2'])","pd.read_csv('file.csv', header=None)","A",1
+"Bạn muốn loại bỏ tất cả các hàng có giá trị NaN trong DataFrame df. Code nào sau đây phù hợp nhất?","df.dropna()","df.fillna(0)","df.isna()","df.drop()","A",1
+"Bạn muốn điền giá trị NaN bằng giá trị trung bình của cột trong DataFrame df. Code nào sau đây phù hợp nhất?","df.fillna(df.mean())","df.fillna(0)","df.replace(np.nan, df.mean())","df.mean()","A",1
+"Bạn muốn xóa các hàng trùng lặp hoàn toàn trong DataFrame df. Code nào sau đây phù hợp nhất?","df.drop_duplicates()","df.unique()","df.deduplicate()","df.remove_duplicates()","A",1
+"Bạn muốn chuẩn hóa dữ liệu về khoảng [0, 1] cho cột 'A' trong DataFrame df. Code nào sau đây phù hợp nhất?","from sklearn.preprocessing import MinMaxScaler; MinMaxScaler().fit_transform(df[['A']])","df['A'] = df['A'] / df['A'].max()","df['A'].normalize()","pd.normalize(df['A'])","A",1
+"Bạn muốn chuẩn hóa dữ liệu về mean=0 và std=1 cho cột 'A' trong DataFrame df. Code nào sau đây phù hợp nhất?","from sklearn.preprocessing import StandardScaler; StandardScaler().fit_transform(df[['A']])","df['A'] = (df['A'] - df['A'].mean()) / df['A'].std()","df['A'].standardize()","pd.standardize(df['A'])","A",1
+"Bạn muốn chuyển tất cả các ký tự trong cột 'text' thành chữ hoa. Code nào sau đây phù hợp nhất?","df['text'].str.upper()","df['text'].upper()","df['text'].upper_case()","str.upper(df['text'])","A",1
+"Bạn muốn tách chuỗi ký tự trong cột 'text' theo khoảng trắng. Code nào sau đây phù hợp nhất?","df['text'].str.split()","df['text'].split()","pd.split(df['text'])","str.split(df['text'])","A",1
+"Bạn muốn mã hóa các giá trị phân loại ['red', 'blue', 'green'] thành số [0, 1, 2]. Code nào sau đây phù hợp nhất?","from sklearn.preprocessing import LabelEncoder; le = LabelEncoder(); le.fit_transform(['red', 'blue', 'green'])","df['color'].map({'red': 0, 'blue': 1, 'green': 2})","df['color'].to_numeric()","pd.encode(df['color'])","A",1
+"Bạn muốn tạo dummy variables (One-Hot Encoding) cho cột 'color' trong DataFrame df. Code nào sau đây phù hợp nhất?","pd.get_dummies(df['color'])","df['color'].get_dummies()","pd.one_hot(df['color'])","df['color'].encode_one_hot()","A",1
+"Bạn muốn tạo MultiIndex từ 2 cột 'A' và 'B' trong DataFrame df. Code nào sau đây phù hợp nhất?","df.set_index(['A', 'B'])","df.index = ['A', 'B']","df.multiindex(['A', 'B'])","pd.MultiIndex(df[['A', 'B']])","A",1
+"Bạn muốn merge 2 DataFrame df1 và df2 theo cột 'key' giữ tất cả hàng từ df1. Code nào sau đây phù hợp nhất?","pd.merge(df1, df2, on='key', how='left')","df1.merge(df2, on='key', how='left')","pd.join(df1, df2, on='key')","pd.merge(df1, df2, on='key')","A",1
+"Bạn muốn nối 2 DataFrame theo hàng (row-wise concatenation). Code nào sau đây phù hợp nhất?","pd.concat([df1, df2], axis=0)","pd.concat([df1, df2])","df1.append(df2)","df1.concat(df2)","B",1
+"Bạn muốn chuyển DataFrame từ dạng wide sang long format. Code nào sau đây phù hợp nhất?","df.melt(id_vars=['id'])","df.pivot()","df.stack()","df.reshape('long')","A",1
+"Bạn muốn chuyển DataFrame từ dạng long sang wide format. Code nào sau đây phù hợp nhất?","df.pivot(index='id', columns='variable', values='value')","df.melt()","df.unstack()","df.reshape('wide')","A",1
+"Bạn muốn stack columns thành index trong DataFrame df. Code nào sau đây phù hợp nhất?","df.stack()","df.melt()","df.pivot()","df.reshape()","A",1
+"Bạn muốn apply một function cho mỗi hàng trong DataFrame df. Code nào sau đây phù hợp nhất?","df.apply(function, axis=1)","df.map(function)","df.transform(function)","df.foreach(function)","A",1
+"Bạn muốn group by theo cột 'category' và tính tổng cho cột 'value'. Code nào sau đây phù hợp nhất?","df.groupby('category')['value'].sum()","df.group('category').sum()","df.aggregate('category', 'sum')","pd.groupby_sum(df, 'category', 'value')","A",1
+"Bạn muốn lọc các hàng có giá trị cột 'A' &gt; 10 trong DataFrame df. Code nào sau đây phù hợp nhất?","df[df['A'] &gt; 10]","df.filter(df['A'] &gt; 10)","df.where(df['A'] &gt; 10)","pd.filter(df, 'A', '&gt;', 10)","A",1
+"Bạn muốn sắp xếp DataFrame df theo cột 'A' giảm dần. Code nào sau đây phù hợp nhất?","df.sort_values('A', ascending=False)","df.order('A', desc=True)","df.sorted('A', reverse=True)","pd.sort(df, 'A', descending=True)","A",1
+"Bạn muốn reset index sau khi chuyển 1 cột thành index trong DataFrame df. Code nào sau đây phù hợp nhất?","df.reset_index()","df.reindex()","df.index_reset()","pd.reset(df)","A",1

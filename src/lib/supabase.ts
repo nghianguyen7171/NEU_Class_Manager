@@ -11,3 +11,6 @@ export interface ExamScore {
   'Số câu đúng': string
   'Điểm': string
 }
+
+// Re-export ExamResponse from types for convenience
+export type { ExamResponse } from './types'
