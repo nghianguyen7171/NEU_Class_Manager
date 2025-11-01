@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** December 2024  
+**Last Updated:** January 2025  
 
 ## 🎯 Core Features
 
@@ -32,6 +32,7 @@
 - ✅ High contrast input fields for better visibility
 - ✅ Accessibility features (ARIA labels, keyboard navigation)
 - ✅ Navigation between score lookup and exam pages
+- ✅ Custom background image (bg.jpg) applied to all pages with semi-transparent overlay for readability
 
 ## 🛠️ Technology Stack
 
@@ -353,6 +354,26 @@ This backup context contains all essential information for AI sessions:
 - ✅ Feature specifications
 - ✅ Technology stack details
 - ✅ Troubleshooting guidelines
+
+---
+
+## 📝 Change Log
+
+### January 2025
+- **Background Image Implementation**: Added `bg.jpg` as background image to all pages (home, lookup, exam)
+  - Copied `bg.jpg` from `logo/` folder to `public/` folder for Next.js access
+  - Applied fixed background image with Next.js `Image` component using `fill` prop
+  - Added semi-transparent white overlay (`bg-white/80`) with backdrop blur for text readability
+  - Updated all three pages: `src/app/page.tsx`, `src/app/lookup/page.tsx`, `src/app/exam/page.tsx`
+  - Fixed div structure issues in exam page (Phase 1, 2, and 3 sections)
+  - Deployed to Vercel successfully
+
+### December 2024
+- **Homepage Redesign**: Moved score lookup to `/lookup` sub-page, created new home page with hero section
+- **Logo Integration**: Added NEU, NCT, and FDA logos to all pages, standardized sizes to 150x150
+- **Summary Table Auto-Update**: Enabled automatic trigger for `DS_Fri_1_2_Midterm.csv` table updates
+- **Exam System Refinements**: Reshuffled test bank, hid scores from students after submission
+- **Multi-Class Support**: Added third class option "Thứ 6, tiết 1-2" for online exam results
 
 ---
 

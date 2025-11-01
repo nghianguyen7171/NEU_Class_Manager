@@ -17,7 +17,7 @@ export default function Home() {
           quality={90}
         />
         {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
       </div>
       
       {/* Hero Section */}

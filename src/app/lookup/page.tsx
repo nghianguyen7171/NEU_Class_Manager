@@ -132,7 +132,7 @@ export default function LookupPage() {
           quality={90}
         />
         {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px]"></div>
       </div>
       
       <div className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
