@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: end-to-end data flow doc — exam → exam_responses → triggers → lookup)
+**Last Updated:** March 28, 2026 (Latest: confirmed DS_Sun_Midterm RLS — SELECT for anon + authenticated)
 
 ## 🎯 Core Features
 
@@ -133,6 +133,8 @@ create table public."DS_Wed _5_6_Midterm.csv" (
   constraint DS_Wed _5_6_Midterm.csv_pkey primary key ("MSV")
 ) TABLESPACE pg_default;
 ```
+
+**Table (Chủ nhật):** `DS_Sun_Midterm.csv` — cùng kiểu cột roster (`Tên`, `MSV`, `Số câu đúng`, `Điểm`). **RLS (production):** policy **Allow public read on DS_Sun_Midterm** — `SELECT` cho **`anon`, `authenticated`** — đủ cho `/lookup` khi app dùng anon key. Cập nhật điểm từ trigger `update_sun_midterm_from_exam_response` (thường `SECURITY DEFINER`) không cần policy INSERT/UPDATE cho client.
 
 **Exam System Tables:**
 
@@ -405,6 +407,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **DS_Sun_Midterm.csv RLS**: Production policy **Allow public read on DS_Sun_Midterm** — `SELECT` for `anon`, `authenticated` — documented in Database Schema; sufficient for lookup; not the cause of stale/wrong score issues when policy is present.
 - **Architecture review**: Added section **Data flow: thi online → điểm trên roster → tra cứu** in this file (`/exam` → `exam_responses` → optional Fri/Sun triggers → `/lookup` reads `DS_*_Midterm.csv` only). Git: `b61416f`.
 - **Browser cache / điểm 0 vs NULL**: `src/lib/supabase.ts` global `fetch` adds `Cache-Control` and `Pragma` in addition to `cache: 'no-store'` to mitigate Chrome (and similar) showing stale tra cứu while another browser sees fresh data. Documented: UI shows **Chưa công bố** only for null/empty; numeric **0** or text **"0"** still displays as published zero — fix in DB with explicit `NULL` on roster columns. Git: `bbc267c`.
 - **Production reset (Chủ nhật)**: All `Số câu đúng` / `Điểm` on `DS_Sun_Midterm.csv` set to NULL; all rows deleted from `exam_responses`. Supabase **Realtime** turned on for both tables in the dashboard. **Note:** The Next.js app does not call `.channel()` / subscriptions — tra cứu still loads scores on each search via PostgREST `select`; Realtime is optional for future live UI or external tooling. Documented in git commit `bc78112` (pushed to `main`).
