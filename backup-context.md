@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: confirmed DS_Sun_Midterm RLS — SELECT for anon + authenticated)
+**Last Updated:** March 28, 2026 (Latest: RLS note — DS_Thurs `TO public` vs DS_Sun `TO anon, authenticated` tương đương cho đọc)
 
 ## 🎯 Core Features
 
@@ -135,6 +135,8 @@ create table public."DS_Wed _5_6_Midterm.csv" (
 ```
 
 **Table (Chủ nhật):** `DS_Sun_Midterm.csv` — cùng kiểu cột roster (`Tên`, `MSV`, `Số câu đúng`, `Điểm`). **RLS (production):** policy **Allow public read on DS_Sun_Midterm** — `SELECT` cho **`anon`, `authenticated`** — đủ cho `/lookup` khi app dùng anon key. Cập nhật điểm từ trigger `update_sun_midterm_from_exam_response` (thường `SECURITY DEFINER`) không cần policy INSERT/UPDATE cho client.
+
+**So sánh với Thứ 5:** `DS_Thurs _7_8_Midterm.csv` có thể dùng policy kiểu **Enable read access for all users** — `SELECT` cho role **`public`** (trong PostgreSQL = mọi role, gồm `anon` và `authenticated`). **Khác `TO public` vs `TO anon, authenticated`** là cách gán role trên policy; với `USING (true)` cả hai đều cho phép client anon đọc bảng — **không** giải thích chênh lệch điểm giữa các trình duyệt. Có thể thống nhất một kiểu (public hoặc anon+authenticated) cho dễ quản lý.
 
 **Exam System Tables:**
 
@@ -407,6 +409,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **RLS role target**: `DS_Thurs _7_8_Midterm.csv` may use `SELECT` **TO public**; `DS_Sun_Midterm.csv` uses **TO anon, authenticated** — both allow anon lookup; documented as equivalent pattern, optional cosmetic alignment only.
 - **DS_Sun_Midterm.csv RLS**: Production policy **Allow public read on DS_Sun_Midterm** — `SELECT` for `anon`, `authenticated` — documented in Database Schema; sufficient for lookup; not the cause of stale/wrong score issues when policy is present.
 - **Architecture review**: Added section **Data flow: thi online → điểm trên roster → tra cứu** in this file (`/exam` → `exam_responses` → optional Fri/Sun triggers → `/lookup` reads `DS_*_Midterm.csv` only). Git: `b61416f`.
 - **Browser cache / điểm 0 vs NULL**: `src/lib/supabase.ts` global `fetch` adds `Cache-Control` and `Pragma` in addition to `cache: 'no-store'` to mitigate Chrome (and similar) showing stale tra cứu while another browser sees fresh data. Documented: UI shows **Chưa công bố** only for null/empty; numeric **0** or text **"0"** still displays as published zero — fix in DB with explicit `NULL` on roster columns. Git: `bbc267c`.
