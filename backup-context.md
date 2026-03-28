@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: RLS note — DS_Thurs `TO public` vs DS_Sun `TO anon, authenticated` tương đương cho đọc)
+**Last Updated:** March 28, 2026 (Latest: troubleshooting — “cập nhật chậm 30ph” vs cache/DB timing, không phải độ trễ PostgREST)
 
 ## 🎯 Core Features
 
@@ -367,7 +367,8 @@ npm run lint         # Code linting
 4. **White text in inputs** - Fixed with explicit text color classes
 5. **Deployment issues** - Check Vercel build logs
 6. **Chrome shows old điểm, Cốc Cốc shows different value** — Usually stale **browser cache** or an old tab. Try: Incognito, **Hard reload** (Ctrl+Shift+R / Cmd+Shift+R), DevTools → Network → **Disable cache**, or clear site data for the app domain and `*.supabase.co`. App uses `fetch` with `cache: 'no-store'` plus `Cache-Control` / `Pragma` on every Supabase request to reduce this.
-7. **Đã set NULL nhưng tra cứu vẫn hiện `0` đ** — Tra cứu chỉ hiện **Chưa công bố** khi giá trị là SQL `NULL`, thiếu field, hoặc chuỗi rỗng. Giá trị số **0** hoặc text **`"0"` / `"0.00"`** được coi là **điểm đã công bố** (đúng với SV được 0 điểm). Kiểm tra trong Supabase: cột `"Điểm"` và `"Số câu đúng"` phải thật sự `NULL` (SQL: `UPDATE ... SET "Điểm" = NULL, "Số câu đúng" = NULL WHERE ...`). Xóa row `exam_responses` **không** xóa điểm trên bảng lớp.
+7. **“Cập nhật chậm >30 phút” rồi mới thấy Chưa công bố** — PostgREST/Postgres **không** trì hoãn đọc hàng chục phút sau khi đã `UPDATE … NULL`. Thường gặp: (a) lúc tra cứu trước đó DB **chưa** NULL hoặc tab/state/cache trình duyệt vẫn hiển thị bản cũ; (b) sau ~30 phút mới **sửa DB** hoặc mới **tìm lại** / đổi trình duyệt / hết cache → trùng thời điểm nên tưởng là “độ trễ server”. Xác minh: chạy `SELECT "Điểm","Số câu đúng" FROM "DS_Sun_Midterm.csv" WHERE …` ngay sau khi `UPDATE` — phải thấy NULL tức thì.
+8. **Đã set NULL nhưng tra cứu vẫn hiện `0` đ** — Tra cứu chỉ hiện **Chưa công bố** khi giá trị là SQL `NULL`, thiếu field, hoặc chuỗi rỗng. Giá trị số **0** hoặc text **`"0"` / `"0.00"`** được coi là **điểm đã công bố** (đúng với SV được 0 điểm). Kiểm tra trong Supabase: cột `"Điểm"` và `"Số câu đúng"` phải thật sự `NULL` (SQL: `UPDATE ... SET "Điểm" = NULL, "Số câu đúng" = NULL WHERE ...`). Xóa row `exam_responses` **không** xóa điểm trên bảng lớp.
 
 ### Debug Tools
 - Connection test component available
@@ -409,6 +410,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Ops note**: User observed MSV 11183366 eventually showing **Chưa công bố** after ~30min — interpreted as slow server update; documented that Postgres read path is immediate once row is NULL; perceived delay aligns with cache / when DB was updated / when user re-searched.
 - **RLS role target**: `DS_Thurs _7_8_Midterm.csv` may use `SELECT` **TO public**; `DS_Sun_Midterm.csv` uses **TO anon, authenticated** — both allow anon lookup; documented as equivalent pattern, optional cosmetic alignment only.
 - **DS_Sun_Midterm.csv RLS**: Production policy **Allow public read on DS_Sun_Midterm** — `SELECT` for `anon`, `authenticated` — documented in Database Schema; sufficient for lookup; not the cause of stale/wrong score issues when policy is present.
 - **Architecture review**: Added section **Data flow: thi online → điểm trên roster → tra cứu** in this file (`/exam` → `exam_responses` → optional Fri/Sun triggers → `/lookup` reads `DS_*_Midterm.csv` only). Git: `b61416f`.
