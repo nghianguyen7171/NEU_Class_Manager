@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: Sun lookup — exam overlay only when roster published)  
+**Last Updated:** March 28, 2026 (Latest: Sun lookup now uses roster table only)
 
 ## 🎯 Core Features
 
@@ -390,7 +390,7 @@ This backup context contains all essential information for AI sessions:
 ### March 2026
 - **Lookup vs exam_responses**: Tra cứu reads class tables (`DS_*_Midterm.csv`); scores there persist after copying from `exam_responses`. Deleting `exam_responses` does not clear roster columns — use `supabase_reset_sun_published_scores.sql` (or equivalent) to null `Số câu đúng` / `Điểm` on the roster if needed.
 - **Redeploy**: Empty commit `0a6c459` to trigger Vercel production build (lookup PostgREST fixes live).
-- **Chủ nhật tra cứu + thi online**: If roster has **either** score column non-empty, lookup overlays latest `exam_responses.total_score` (fix stale roster). If **both** roster score columns are NULL/empty → **Chưa công bố** only (no exam leak after teacher unpublishes).
+- **Chủ nhật tra cứu + thi online**: Reverted to roster-table source of truth only. Lookup no longer overlays `exam_responses` for Chủ nhật, so setting `Số câu đúng`/`Điểm` to NULL in `DS_Sun_Midterm.csv` always renders **Chưa công bố**.
 - **Lookup score display**: Tra cứu uses explicit `.select('"Tên", MSV, "Số câu đúng", "Điểm"')` and NFC-normalized keys in `rowToExamScore` so Vietnamese columns map reliably from PostgREST. Added `supabase_verify_sun_scores.sql` to confirm DB values vs UI.
 - **Sun class scores**: Added `supabase_sun_midterm_sync.sql` — trigger on `exam_responses` updates `DS_Sun_Midterm.csv` roster rows (MSV match) with `Số câu đúng` (x/40) and `Điểm`; includes one-time backfill from latest attempt per student. Lookup UI shows **Chưa công bố** when those fields are empty/null.
 - **exam_responses setup**: Hardened `supabase_setup.sql` (idempotent policies, `anon`/`authenticated` RLS, grants + sequence, `NOTIFY pgrst` reload) for Supabase submit errors when the table is missing.

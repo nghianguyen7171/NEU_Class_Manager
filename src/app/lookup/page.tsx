@@ -26,27 +26,7 @@ function rowToExamScore(raw: Record<string, unknown>): ExamScore {
   }
 }
 
-/** Online midterm score (0.25 / câu, 40 câu) — same rule as exam submit. */
-function scoresFromExamTotalScore(totalScore: number): Pick<ExamScore, 'Số câu đúng' | 'Điểm'> {
-  const ts = Number(totalScore)
-  const nCorrect = Math.round(ts / 0.25)
-  return {
-    'Số câu đúng': `${nCorrect}/40`,
-    'Điểm': ts.toFixed(2)
-  }
-}
-
 const SUN_SCORE_TABLE = 'DS_Sun_Midterm.csv'
-
-/** Roster NULL = chưa công bố công khai; không lộ điểm từ exam_responses. */
-function rosterScoresLookPublished(s: ExamScore): boolean {
-  const empty = (v: unknown) =>
-    v === null ||
-    v === undefined ||
-    String(v).trim() === '' ||
-    String(v).trim().toLowerCase() === 'null'
-  return !empty(s['Số câu đúng']) || !empty(s['Điểm'])
-}
 
 export default function LookupPage() {
   const [selectedClass, setSelectedClass] = useState('Thứ 5, tiết 7-8')
@@ -157,26 +137,9 @@ export default function LookupPage() {
           setError('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại.')
         }
       } else if (searchResult) {
-        let display = rowToExamScore(searchResult as Record<string, unknown>)
-        // Chủ nhật: chỉ khi roster đã có điểm công bố (ít nhất một cột) mới lấy bản mới nhất từ exam_responses để tránh lệch trigger/SQL.
-        // Cả hai cột NULL trên roster = thu hồi công bố → hiển thị Chưa công bố, không đọc exam_responses.
-        if (tableName === SUN_SCORE_TABLE && rosterScoresLookPublished(display)) {
-          const sid = studentId.trim()
-          const { data: examRows, error: examErr } = await supabase
-            .from('exam_responses')
-            .select('total_score')
-            .eq('student_id', sid)
-            .order('created_at', { ascending: false })
-            .limit(1)
-          if (!examErr && examRows && examRows.length > 0) {
-            const rawTs = examRows[0].total_score
-            if (rawTs !== null && rawTs !== undefined) {
-              const merged = scoresFromExamTotalScore(Number(rawTs))
-              display = { ...display, ...merged }
-            }
-          }
-        }
-        setResult(display)
+        // Lookup always follows published roster table values for this class.
+        // If teachers set score columns to NULL, UI must show "Chưa công bố".
+        setResult(rowToExamScore(searchResult as Record<string, unknown>))
       } else {
         setNotFound(true)
       }
