@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: Chủ nhật / DS_Sun_Midterm.csv wired to lookup)  
+**Last Updated:** March 28, 2026 (Latest: Next.js 15.5.9 security patch for Vercel)  
 
 ## 🎯 Core Features
 
@@ -387,6 +387,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Next.js security**: Upgraded `next` and `eslint-config-next` to **15.5.9** (patches CVE-2025-66478 / React2Shell and follow-on RSC advisories; Vercel blocks older 15.5.x deploys).
 - **Sunday class lookup**: Mapped label `Chủ nhật` → Supabase table `DS_Sun_Midterm.csv` in `src/app/lookup/page.tsx` (`CLASS_TABLE_MAPPING` + dropdown). Added the same table to `src/components/ConnectionTest.tsx`. Roster source: `DS_Sun_Midterm.csv` (48 students, columns Tên, MSV, Số câu đúng, Điểm).
 
 ### January 2025
