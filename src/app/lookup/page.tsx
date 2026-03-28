@@ -38,6 +38,16 @@ function scoresFromExamTotalScore(totalScore: number): Pick<ExamScore, 'Số câ
 
 const SUN_SCORE_TABLE = 'DS_Sun_Midterm.csv'
 
+/** Roster NULL = chưa công bố công khai; không lộ điểm từ exam_responses. */
+function rosterScoresLookPublished(s: ExamScore): boolean {
+  const empty = (v: unknown) =>
+    v === null ||
+    v === undefined ||
+    String(v).trim() === '' ||
+    String(v).trim().toLowerCase() === 'null'
+  return !empty(s['Số câu đúng']) || !empty(s['Điểm'])
+}
+
 export default function LookupPage() {
   const [selectedClass, setSelectedClass] = useState('Thứ 5, tiết 7-8')
   const [studentName, setStudentName] = useState('')
@@ -148,8 +158,9 @@ export default function LookupPage() {
         }
       } else if (searchResult) {
         let display = rowToExamScore(searchResult as Record<string, unknown>)
-        // Chủ nhật: hiển thị điểm theo bài thi online mới nhất (exam_responses), vì roster có thể lệch nếu trigger/SQL chưa đồng bộ.
-        if (tableName === SUN_SCORE_TABLE) {
+        // Chủ nhật: chỉ khi roster đã có điểm công bố (ít nhất một cột) mới lấy bản mới nhất từ exam_responses để tránh lệch trigger/SQL.
+        // Cả hai cột NULL trên roster = thu hồi công bố → hiển thị Chưa công bố, không đọc exam_responses.
+        if (tableName === SUN_SCORE_TABLE && rosterScoresLookPublished(display)) {
           const sid = studentId.trim()
           const { data: examRows, error: examErr } = await supabase
             .from('exam_responses')
