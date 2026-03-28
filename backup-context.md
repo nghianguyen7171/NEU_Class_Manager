@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: lookup explicit columns + NFC row mapping for scores)  
+**Last Updated:** March 28, 2026 (Latest: Chủ nhật lookup merges latest exam_responses score)  
 
 ## 🎯 Core Features
 
@@ -390,6 +390,7 @@ This backup context contains all essential information for AI sessions:
 ### March 2026
 - **Lookup vs exam_responses**: Tra cứu reads class tables (`DS_*_Midterm.csv`); scores there persist after copying from `exam_responses`. Deleting `exam_responses` does not clear roster columns — use `supabase_reset_sun_published_scores.sql` (or equivalent) to null `Số câu đúng` / `Điểm` on the roster if needed.
 - **Redeploy**: Empty commit `0a6c459` to trigger Vercel production build (lookup PostgREST fixes live).
+- **Chủ nhật tra cứu + thi online**: Lookup for `DS_Sun_Midterm.csv` overlays **Số câu đúng** / **Điểm** from latest `exam_responses` row (by `student_id`) when present, so scores match the last submit even if roster table is stale.
 - **Lookup score display**: Tra cứu uses explicit `.select('"Tên", MSV, "Số câu đúng", "Điểm"')` and NFC-normalized keys in `rowToExamScore` so Vietnamese columns map reliably from PostgREST. Added `supabase_verify_sun_scores.sql` to confirm DB values vs UI.
 - **Sun class scores**: Added `supabase_sun_midterm_sync.sql` — trigger on `exam_responses` updates `DS_Sun_Midterm.csv` roster rows (MSV match) with `Số câu đúng` (x/40) and `Điểm`; includes one-time backfill from latest attempt per student. Lookup UI shows **Chưa công bố** when those fields are empty/null.
 - **exam_responses setup**: Hardened `supabase_setup.sql` (idempotent policies, `anon`/`authenticated` RLS, grants + sequence, `NOTIFY pgrst` reload) for Supabase submit errors when the table is missing.

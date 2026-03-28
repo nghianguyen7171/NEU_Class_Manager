@@ -26,6 +26,18 @@ function rowToExamScore(raw: Record<string, unknown>): ExamScore {
   }
 }
 
+/** Online midterm score (0.25 / câu, 40 câu) — same rule as exam submit. */
+function scoresFromExamTotalScore(totalScore: number): Pick<ExamScore, 'Số câu đúng' | 'Điểm'> {
+  const ts = Number(totalScore)
+  const nCorrect = Math.round(ts / 0.25)
+  return {
+    'Số câu đúng': `${nCorrect}/40`,
+    'Điểm': ts.toFixed(2)
+  }
+}
+
+const SUN_SCORE_TABLE = 'DS_Sun_Midterm.csv'
+
 export default function LookupPage() {
   const [selectedClass, setSelectedClass] = useState('Thứ 5, tiết 7-8')
   const [studentName, setStudentName] = useState('')
@@ -40,7 +52,7 @@ export default function LookupPage() {
     'Thứ 5, tiết 7-8': 'DS_Thurs _7_8_Midterm.csv',
     'Thứ 4, tiết 5-6': 'DS_Wed _5_6_Midterm.csv',
     'Thứ 6, tiết 1-2': 'DS_Fri_1_2_Midterm.csv',
-    'Chủ nhật': 'DS_Sun_Midterm.csv'
+    'Chủ nhật': SUN_SCORE_TABLE
   }
 
   // Helper function to get table name from class
@@ -135,7 +147,25 @@ export default function LookupPage() {
           setError('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại.')
         }
       } else if (searchResult) {
-        setResult(rowToExamScore(searchResult as Record<string, unknown>))
+        let display = rowToExamScore(searchResult as Record<string, unknown>)
+        // Chủ nhật: hiển thị điểm theo bài thi online mới nhất (exam_responses), vì roster có thể lệch nếu trigger/SQL chưa đồng bộ.
+        if (tableName === SUN_SCORE_TABLE) {
+          const sid = studentId.trim()
+          const { data: examRows, error: examErr } = await supabase
+            .from('exam_responses')
+            .select('total_score')
+            .eq('student_id', sid)
+            .order('created_at', { ascending: false })
+            .limit(1)
+          if (!examErr && examRows && examRows.length > 0) {
+            const rawTs = examRows[0].total_score
+            if (rawTs !== null && rawTs !== undefined) {
+              const merged = scoresFromExamTotalScore(Number(rawTs))
+              display = { ...display, ...merged }
+            }
+          }
+        }
+        setResult(display)
       } else {
         setNotFound(true)
       }
