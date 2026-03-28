@@ -394,6 +394,14 @@ export default function LookupPage() {
             })()}
           </div>
         )}
+        {process.env.NEXT_PUBLIC_APP_GIT_SHA ? (
+          <p
+            className="text-center text-[11px] text-gray-500 mt-8 font-mono"
+            title="Git commit trên Vercel — đối chiếu với repo nếu tra cứu không đúng"
+          >
+            Phiên bản: {process.env.NEXT_PUBLIC_APP_GIT_SHA.slice(0, 7)}
+          </p>
+        ) : null}
         </div>
       </div>
     </div>

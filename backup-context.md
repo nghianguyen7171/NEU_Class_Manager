@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: Sun lookup now uses roster table only)
+**Last Updated:** March 28, 2026 (Latest: Supabase no-store fetch, lookup build stamp, Sun trigger disable SQL)
 
 ## 🎯 Core Features
 
@@ -388,6 +388,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Lookup deploy debug**: `next.config.ts` exposes `NEXT_PUBLIC_APP_GIT_SHA` (Vercel `VERCEL_GIT_COMMIT_SHA`); `/lookup` shows **Phiên bản: abc1234** to confirm production bundle. `createClient` uses `fetch` with `cache: 'no-store'`. Added `supabase_sun_disable_autosync_trigger.sql` — `DISABLE TRIGGER trigger_sun_midterm_on_exam` stops inserts from rewriting `DS_Sun_Midterm.csv` after manual NULL.
 - **Lookup vs exam_responses**: Tra cứu reads class tables (`DS_*_Midterm.csv`); scores there persist after copying from `exam_responses`. Deleting `exam_responses` does not clear roster columns — use `supabase_reset_sun_published_scores.sql` (or equivalent) to null `Số câu đúng` / `Điểm` on the roster if needed.
 - **Redeploy**: Empty commit `0a6c459` to trigger Vercel production build (lookup PostgREST fixes live).
 - **Chủ nhật tra cứu + thi online**: Reverted to roster-table source of truth only. Lookup no longer overlays `exam_responses` for Chủ nhật, so setting `Số câu đúng`/`Điểm` to NULL in `DS_Sun_Midterm.csv` always renders **Chưa công bố**.
