@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: Next.js 15.5.9 security patch for Vercel)  
+**Last Updated:** March 28, 2026 (Latest: supabase_setup.sql hardening for exam_responses)  
 
 ## 🎯 Core Features
 
@@ -344,8 +344,9 @@ npm run lint         # Code linting
 ### Common Issues
 1. **"No record found"** - Check if data exists in database table
 2. **Connection errors** - Verify Supabase credentials
-3. **White text in inputs** - Fixed with explicit text color classes
-4. **Deployment issues** - Check Vercel build logs
+3. **`Could not find the table 'public.exam_responses' in the schema cache`** - Run `supabase_setup.sql` in the Supabase SQL Editor (creates `exam_responses` + RLS + grants). Then retry submit; if it persists, wait a minute or run `NOTIFY pgrst, 'reload schema';` again.
+4. **White text in inputs** - Fixed with explicit text color classes
+5. **Deployment issues** - Check Vercel build logs
 
 ### Debug Tools
 - Connection test component available
@@ -387,6 +388,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **exam_responses setup**: Hardened `supabase_setup.sql` (idempotent policies, `anon`/`authenticated` RLS, grants + sequence, `NOTIFY pgrst` reload) for Supabase submit errors when the table is missing.
 - **Next.js security**: Upgraded `next` and `eslint-config-next` to **15.5.9** (patches CVE-2025-66478 / React2Shell and follow-on RSC advisories; Vercel blocks older 15.5.x deploys).
 - **Sunday class lookup**: Mapped label `Chủ nhật` → Supabase table `DS_Sun_Midterm.csv` in `src/app/lookup/page.tsx` (`CLASS_TABLE_MAPPING` + dropdown). Added the same table to `src/components/ConnectionTest.tsx`. Roster source: `DS_Sun_Midterm.csv` (48 students, columns Tên, MSV, Số câu đúng, Điểm).
 
