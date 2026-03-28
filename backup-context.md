@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: production reset — Sun roster NULL, `exam_responses` emptied; Supabase Realtime enabled on both tables; app still uses request-time `.select()` only)
+**Last Updated:** March 28, 2026 (Latest: Supabase fetch anti-cache headers; troubleshooting Chrome vs Cốc Cốc + điểm 0 vs NULL trên tra cứu)
 
 ## 🎯 Core Features
 
@@ -181,14 +181,19 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://asxhozsfmlmsrflmzizr.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-export interface ExamScore {
-  Tên: string
-  MSV: number
-  'Số câu đúng': string
-  'Điểm': string
-}
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (input, init = {}) => {
+      const headers = new Headers(init.headers)
+      if (!headers.has('Cache-Control')) {
+        headers.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+      }
+      if (!headers.has('Pragma')) headers.set('Pragma', 'no-cache')
+      return fetch(input, { ...init, headers, cache: 'no-store' })
+    },
+  },
+})
+// ExamScore interface: see repo (Tên, MSV, optional Số câu đúng / Điểm)
 ```
 
 ### Exam Generator (src/lib/examGenerator.ts)
@@ -347,6 +352,8 @@ npm run lint         # Code linting
 3. **`Could not find the table 'public.exam_responses' in the schema cache`** - Run `supabase_setup.sql` in the Supabase SQL Editor (creates `exam_responses` + RLS + grants). Then retry submit; if it persists, wait a minute or run `NOTIFY pgrst, 'reload schema';` again.
 4. **White text in inputs** - Fixed with explicit text color classes
 5. **Deployment issues** - Check Vercel build logs
+6. **Chrome shows old điểm, Cốc Cốc shows different value** — Usually stale **browser cache** or an old tab. Try: Incognito, **Hard reload** (Ctrl+Shift+R / Cmd+Shift+R), DevTools → Network → **Disable cache**, or clear site data for the app domain and `*.supabase.co`. App uses `fetch` with `cache: 'no-store'` plus `Cache-Control` / `Pragma` on every Supabase request to reduce this.
+7. **Đã set NULL nhưng tra cứu vẫn hiện `0` đ** — Tra cứu chỉ hiện **Chưa công bố** khi giá trị là SQL `NULL`, thiếu field, hoặc chuỗi rỗng. Giá trị số **0** hoặc text **`"0"` / `"0.00"`** được coi là **điểm đã công bố** (đúng với SV được 0 điểm). Kiểm tra trong Supabase: cột `"Điểm"` và `"Số câu đúng"` phải thật sự `NULL` (SQL: `UPDATE ... SET "Điểm" = NULL, "Số câu đúng" = NULL WHERE ...`). Xóa row `exam_responses` **không** xóa điểm trên bảng lớp.
 
 ### Debug Tools
 - Connection test component available
@@ -388,8 +395,9 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Browser cache / điểm 0 vs NULL**: `src/lib/supabase.ts` global `fetch` adds `Cache-Control` and `Pragma` in addition to `cache: 'no-store'` to mitigate Chrome (and similar) showing stale tra cứu while another browser sees fresh data. Documented: UI shows **Chưa công bố** only for null/empty; numeric **0** or text **"0"** still displays as published zero — fix in DB with explicit `NULL` on roster columns.
 - **Production reset (Chủ nhật)**: All `Số câu đúng` / `Điểm` on `DS_Sun_Midterm.csv` set to NULL; all rows deleted from `exam_responses`. Supabase **Realtime** turned on for both tables in the dashboard. **Note:** The Next.js app does not call `.channel()` / subscriptions — tra cứu still loads scores on each search via PostgREST `select`; Realtime is optional for future live UI or external tooling. Documented in git commit `bc78112` (pushed to `main`).
-- **Lookup deploy debug**: `next.config.ts` exposes `NEXT_PUBLIC_APP_GIT_SHA` (Vercel `VERCEL_GIT_COMMIT_SHA`); `/lookup` shows **Phiên bản: abc1234** to confirm production bundle. `createClient` uses `fetch` with `cache: 'no-store'`. Added `supabase_sun_disable_autosync_trigger.sql` — `DISABLE TRIGGER trigger_sun_midterm_on_exam` stops inserts from rewriting `DS_Sun_Midterm.csv` after manual NULL.
+- **Lookup deploy debug**: `next.config.ts` exposes `NEXT_PUBLIC_APP_GIT_SHA` (Vercel `VERCEL_GIT_COMMIT_SHA`); `/lookup` shows **Phiên bản: abc1234** to confirm production bundle. `createClient` uses `fetch` with `cache: 'no-store'` plus `Cache-Control` / `Pragma` headers. Added `supabase_sun_disable_autosync_trigger.sql` — `DISABLE TRIGGER trigger_sun_midterm_on_exam` stops inserts from rewriting `DS_Sun_Midterm.csv` after manual NULL.
 - **Lookup vs exam_responses**: Tra cứu reads class tables (`DS_*_Midterm.csv`); scores there persist after copying from `exam_responses`. Deleting `exam_responses` does not clear roster columns — use `supabase_reset_sun_published_scores.sql` (or equivalent) to null `Số câu đúng` / `Điểm` on the roster if needed.
 - **Redeploy**: Empty commit `0a6c459` to trigger Vercel production build (lookup PostgREST fixes live).
 - **Chủ nhật tra cứu + thi online**: Reverted to roster-table source of truth only. Lookup no longer overlays `exam_responses` for Chủ nhật, so setting `Số câu đúng`/`Điểm` to NULL in `DS_Sun_Midterm.csv` always renders **Chưa công bố**.

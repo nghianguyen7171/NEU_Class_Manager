@@ -5,9 +5,18 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOi
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   global: {
-    fetch: (url, options = {}) =>
-      fetch(url, { ...options, cache: 'no-store' })
-  }
+    /** Strong anti-cache: some browsers still reuse GET responses unless Cache-Control is explicit. */
+    fetch: (input, init = {}) => {
+      const headers = new Headers(init.headers)
+      if (!headers.has('Cache-Control')) {
+        headers.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+      }
+      if (!headers.has('Pragma')) {
+        headers.set('Pragma', 'no-cache')
+      }
+      return fetch(input, { ...init, headers, cache: 'no-store' })
+    },
+  },
 })
 
 export interface ExamScore {
