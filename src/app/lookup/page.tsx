@@ -19,7 +19,8 @@ export default function LookupPage() {
   const CLASS_TABLE_MAPPING = {
     'Thứ 5, tiết 7-8': 'DS_Thurs _7_8_Midterm.csv',
     'Thứ 4, tiết 5-6': 'DS_Wed _5_6_Midterm.csv',
-    'Thứ 6, tiết 1-2': 'DS_Fri_1_2_Midterm.csv'
+    'Thứ 6, tiết 1-2': 'DS_Fri_1_2_Midterm.csv',
+    'Chủ nhật': 'DS_Sun_Midterm.csv'
   }
 
   // Helper function to get table name from class
@@ -204,6 +205,7 @@ export default function LookupPage() {
                 <option value="Thứ 5, tiết 7-8">Thứ 5, tiết 7-8</option>
                 <option value="Thứ 4, tiết 5-6">Thứ 4, tiết 5-6</option>
                 <option value="Thứ 6, tiết 1-2">Thứ 6, tiết 1-2 (Kết quả thi online)</option>
+                <option value="Chủ nhật">Chủ nhật</option>
               </select>
             </div>
             {/* Student Name */}

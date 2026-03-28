@@ -5,13 +5,13 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** January 2025 (Latest: Logo update, text contrast, autocomplete disable)  
+**Last Updated:** March 28, 2026 (Latest: Chủ nhật / DS_Sun_Midterm.csv wired to lookup)  
 
 ## 🎯 Core Features
 
 ### Score Lookup System
 - ✅ Multi-class exam score lookup
-- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6 / Thứ 6, tiết 1-2)
+- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6 / Thứ 6, tiết 1-2 / Chủ nhật)
 - ✅ Student search by name (Tên) and student ID (MSV)
 - ✅ Dynamic table querying based on selected class
 - ✅ Real-time database query with Supabase
@@ -271,7 +271,7 @@ npm run lint         # Code linting
 1. **Fixed table mapping** - Corrected class-to-table mapping (Thứ 5, tiết 7-8 → DS_Thurs _7_8_Midterm.csv)
 2. **Updated page title** - Changed browser tab to "NEU Class Manager" (simplified from "NEU Class Manager - Tra Cứu Điểm Thi")
 3. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
-4. **Multi-table connection testing** - ConnectionTest now tests all available tables (including DS_Fri_1_2_Midterm.csv)
+4. **Multi-table connection testing** - ConnectionTest tests all score tables including DS_Fri_1_2_Midterm.csv and DS_Sun_Midterm.csv (Chủ nhật)
 5. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
 6. **Enhanced results display** - Better visual hierarchy with card-based layout
 7. **Background image** - Added bg.jpg with 30% opacity overlay for better visibility
@@ -364,7 +364,7 @@ npm run lint         # Code linting
 
 ### Database
 - **Supabase Project:** asxhozsfmlmsrflmzizr
-- **Score Tables:** DS_Thurs _7_8_Midterm.csv, DS_Wed _5_6_Midterm.csv
+- **Score Tables:** DS_Thurs _7_8_Midterm.csv, DS_Wed _5_6_Midterm.csv, DS_Fri_1_2_Midterm.csv, DS_Sun_Midterm.csv
 - **Exam Tables:** test_library_lec1_lec6.csv, exam_responses
 
 ---
@@ -385,6 +385,9 @@ This backup context contains all essential information for AI sessions:
 ---
 
 ## 📝 Change Log
+
+### March 2026
+- **Sunday class lookup**: Mapped label `Chủ nhật` → Supabase table `DS_Sun_Midterm.csv` in `src/app/lookup/page.tsx` (`CLASS_TABLE_MAPPING` + dropdown). Added the same table to `src/components/ConnectionTest.tsx`. Roster source: `DS_Sun_Midterm.csv` (48 students, columns Tên, MSV, Số câu đúng, Điểm).
 
 ### January 2025
 - **Background Image Implementation**: Added `bg.jpg` as background image to all pages (home, lookup, exam)
