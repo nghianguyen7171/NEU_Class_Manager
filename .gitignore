@@ -20,6 +20,10 @@
 .DS_Store
 *.pem
 
+# Supabase exports (may contain PII / exam answers)
+exam_responses_rows.csv
+*_rows.csv
+
 # debug
 npm-debug.log*
 yarn-debug.log*

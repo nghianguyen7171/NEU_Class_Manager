@@ -8,8 +8,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export interface ExamScore {
   Tên: string
   MSV: number
-  'Số câu đúng'?: string | null
-  'Điểm'?: string | null
+  /** PostgREST may return string or number depending on column type */
+  'Số câu đúng'?: string | number | null
+  'Điểm'?: string | number | null
 }
 
 // Re-export ExamResponse from types for convenience

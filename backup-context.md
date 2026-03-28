@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: Sun midterm score sync + lookup placeholders)  
+**Last Updated:** March 28, 2026 (Latest: lookup explicit columns + NFC row mapping for scores)  
 
 ## 🎯 Core Features
 
@@ -388,6 +388,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Lookup score display**: Tra cứu uses explicit `.select('"Tên", MSV, "Số câu đúng", "Điểm"')` and NFC-normalized keys in `rowToExamScore` so Vietnamese columns map reliably from PostgREST. Added `supabase_verify_sun_scores.sql` to confirm DB values vs UI.
 - **Sun class scores**: Added `supabase_sun_midterm_sync.sql` — trigger on `exam_responses` updates `DS_Sun_Midterm.csv` roster rows (MSV match) with `Số câu đúng` (x/40) and `Điểm`; includes one-time backfill from latest attempt per student. Lookup UI shows **Chưa công bố** when those fields are empty/null.
 - **exam_responses setup**: Hardened `supabase_setup.sql` (idempotent policies, `anon`/`authenticated` RLS, grants + sequence, `NOTIFY pgrst` reload) for Supabase submit errors when the table is missing.
 - **Next.js security**: Upgraded `next` and `eslint-config-next` to **15.5.9** (patches CVE-2025-66478 / React2Shell and follow-on RSC advisories; Vercel blocks older 15.5.x deploys).

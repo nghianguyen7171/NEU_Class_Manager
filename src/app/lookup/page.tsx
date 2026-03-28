@@ -6,6 +6,26 @@ import Image from 'next/image'
 import { supabase, ExamScore } from '@/lib/supabase'
 import ConnectionTest from '@/components/ConnectionTest'
 
+/** Quoted identifiers so PostgREST returns Vietnamese columns reliably (avoid select('*') gaps). */
+const LOOKUP_COLUMNS = '"Tên", MSV, "Số câu đúng", "Điểm"'
+
+function nfcKey(row: Record<string, unknown>, logicalName: string): unknown {
+  const want = logicalName.normalize('NFC')
+  for (const k of Object.keys(row)) {
+    if (k.normalize('NFC') === want) return row[k]
+  }
+  return undefined
+}
+
+function rowToExamScore(raw: Record<string, unknown>): ExamScore {
+  return {
+    Tên: String(nfcKey(raw, 'Tên') ?? ''),
+    MSV: Number(nfcKey(raw, 'MSV')),
+    'Số câu đúng': nfcKey(raw, 'Số câu đúng') as ExamScore['Số câu đúng'],
+    'Điểm': nfcKey(raw, 'Điểm') as ExamScore['Điểm']
+  }
+}
+
 export default function LookupPage() {
   const [selectedClass, setSelectedClass] = useState('Thứ 5, tiết 7-8')
   const [studentName, setStudentName] = useState('')
@@ -28,11 +48,20 @@ export default function LookupPage() {
     return CLASS_TABLE_MAPPING[className as keyof typeof CLASS_TABLE_MAPPING] || 'DS_Thurs _7_8_Midterm.csv'
   }
 
-  const scoreDisplay = (value: string | null | undefined) => {
-    const s = value != null ? String(value).trim() : ''
-    const text = s !== '' ? s : 'Chưa công bố'
-    const pending = text === 'Chưa công bố'
-    return { text, pending }
+  const scoreDisplay = (value: string | number | null | undefined) => {
+    if (value === null || value === undefined) {
+      return { text: 'Chưa công bố', pending: true }
+    }
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      const text =
+        Number.isInteger(value) ? String(value) : String(value)
+      return { text, pending: false }
+    }
+    const s = String(value).trim()
+    if (s === '' || s === 'null' || s === 'undefined') {
+      return { text: 'Chưa công bố', pending: true }
+    }
+    return { text: s, pending: false }
   }
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -59,7 +88,7 @@ export default function LookupPage() {
       // Strategy 1: Exact match with trimmed values
       const exactResult = await supabase
         .from(tableName)
-        .select('*')
+        .select(LOOKUP_COLUMNS)
         .eq('Tên', studentName.trim())
         .eq('MSV', parseInt(studentId.trim()))
         .single()
@@ -70,7 +99,7 @@ export default function LookupPage() {
         // Strategy 2: Try with MSV as string
         const stringResult = await supabase
           .from(tableName)
-          .select('*')
+          .select(LOOKUP_COLUMNS)
           .eq('Tên', studentName.trim())
           .eq('MSV', studentId.trim())
           .single()
@@ -81,7 +110,7 @@ export default function LookupPage() {
           // Strategy 3: Case-insensitive name search
           const caseInsensitiveResult = await supabase
             .from(tableName)
-            .select('*')
+            .select(LOOKUP_COLUMNS)
             .ilike('Tên', `%${studentName.trim()}%`)
             .eq('MSV', parseInt(studentId.trim()))
             .single()
@@ -106,7 +135,7 @@ export default function LookupPage() {
           setError('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại.')
         }
       } else if (searchResult) {
-        setResult(searchResult)
+        setResult(rowToExamScore(searchResult as Record<string, unknown>))
       } else {
         setNotFound(true)
       }
