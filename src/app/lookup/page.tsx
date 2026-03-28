@@ -28,6 +28,13 @@ export default function LookupPage() {
     return CLASS_TABLE_MAPPING[className as keyof typeof CLASS_TABLE_MAPPING] || 'DS_Thurs _7_8_Midterm.csv'
   }
 
+  const scoreDisplay = (value: string | null | undefined) => {
+    const s = value != null ? String(value).trim() : ''
+    const text = s !== '' ? s : 'Chưa công bố'
+    const pending = text === 'Chưa công bố'
+    return { text, pending }
+  }
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -310,7 +317,10 @@ export default function LookupPage() {
               </div>
             )}
 
-            {result && (
+            {result && (() => {
+              const soCorrect = scoreDisplay(result['Số câu đúng'])
+              const diem = scoreDisplay(result['Điểm'])
+              return (
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-8">
                 <h3 className="text-2xl font-bold text-green-800 mb-6 text-center">
                   🎉 Kết quả tìm kiếm
@@ -327,19 +337,28 @@ export default function LookupPage() {
                     <span className="text-3xl mr-4">🎯</span>
                     <div>
                       <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Số câu đúng:</span>
-                      <p className="text-lg font-bold text-green-800 mt-1">{result['Số câu đúng']}</p>
+                      <p
+                        className={`text-lg font-bold mt-1 ${soCorrect.pending ? 'text-gray-600' : 'text-green-800'}`}
+                      >
+                        {soCorrect.text}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center bg-white rounded-lg p-4 shadow-sm">
                     <span className="text-3xl mr-4">🧾</span>
                     <div>
                       <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">Điểm số:</span>
-                      <p className="text-2xl font-bold text-green-800 mt-1">{result['Điểm']}</p>
+                      <p
+                        className={`text-2xl font-bold mt-1 ${diem.pending ? 'text-gray-600' : 'text-green-800'}`}
+                      >
+                        {diem.text}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
+              )
+            })()}
           </div>
         )}
         </div>

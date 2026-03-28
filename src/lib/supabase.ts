@@ -8,8 +8,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export interface ExamScore {
   Tên: string
   MSV: number
-  'Số câu đúng': string
-  'Điểm': string
+  'Số câu đúng'?: string | null
+  'Điểm'?: string | null
 }
 
 // Re-export ExamResponse from types for convenience
