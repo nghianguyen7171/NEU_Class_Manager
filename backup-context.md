@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: Supabase fetch anti-cache headers; troubleshooting Chrome vs Cốc Cốc + điểm 0 vs NULL trên tra cứu)
+**Last Updated:** March 28, 2026 (Latest: end-to-end data flow doc — exam → exam_responses → triggers → lookup)
 
 ## 🎯 Core Features
 
@@ -18,12 +18,11 @@
 - ✅ Browser autocomplete disabled for privacy
 
 ### Online Exam System
-- ✅ Randomized 40-question selection from 87-question bank
-- ✅ 4 fixed test versions with shuffled answer choices
-- ✅ Sequential test version assignment per student
+- ✅ Four fixed 40-question sets from 87-question bank (seeded shuffle per version in `examGenerator.ts`; choices stay A–D order)
+- ✅ 4 test versions; assignment via browser `localStorage` counter (not server-side per student)
+- ✅ One row per MSV in `exam_responses` enforced at start (`getExamResponse`)
 - ✅ Automatic scoring (0.25 points per correct answer)
-- ✅ Response storage with detailed tracking
-- ✅ One-time access enforcement
+- ✅ Response storage with detailed tracking in `exam_responses`
 
 ### User Interface
 - ✅ Professional, responsive UI with enhanced styling
@@ -213,6 +212,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 - Error reporting for troubleshooting
 - User-friendly interface for debugging
 
+## 🔄 Data flow: thi online → điểm trên roster → tra cứu
+
+1. **`/exam` (client):** SV nhập tên + MSV → `getExamResponse` kiểm tra `exam_responses` theo `student_id`; nếu đã có bản ghi thì chặn làm lại (một MSV toàn hệ thống, không tách lớp). Đề 1–4: `localStorage` counter `(n % 4) + 1` trên từng trình duyệt. Câu hỏi: `test_library_lec1_lec6.csv` → 4 bộ 40 câu (seed cố định trong `examGenerator.ts`). Nộp bài: `saveExamResponse` chấm 0.25/câu → **INSERT** `exam_responses` (`student_name`, `student_id`, `test_version`, `responses`, `total_score`).
+
+2. **PostgreSQL (tùy script đã chạy trên Supabase):** **AFTER INSERT** trên `exam_responses` có thể kích hoạt:
+   - `supabase_enable_auto_update.sql` → **upsert** `DS_Fri_1_2_Midterm.csv` (Thứ 6) theo `MSV` / `student_id`.
+   - `supabase_sun_midterm_sync.sql` → **UPDATE** dòng có sẵn trong `DS_Sun_Midterm.csv` khi `TRIM(MSV) = TRIM(student_id)` (Chủ nhật).
+   Thứ 5 / Thứ 4: bảng `DS_Thurs_*`, `DS_Wed_*` **không** được repo nối tự động từ `exam_responses` — điểm thường nhập/import thủ công.
+
+3. **`/lookup` (client):** Chọn lớp → `CLASS_TABLE_MAPPING` → `.select` các cột `Tên`, `MSV`, `Số câu đúng`, `Điểm` trên **đúng bảng lớp**. **Không** merge `exam_responses`. `NULL`/rỗng → UI “Chưa công bố”; `0` hoặc `"0"` vẫn là điểm đã công bố.
+
 ## 🚀 Deployment Information
 
 ### Environment Variables
@@ -395,6 +405,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Architecture review**: Added section **Data flow: thi online → điểm trên roster → tra cứu** in this file (`/exam` → `exam_responses` → optional Fri/Sun triggers → `/lookup` reads `DS_*_Midterm.csv` only).
 - **Browser cache / điểm 0 vs NULL**: `src/lib/supabase.ts` global `fetch` adds `Cache-Control` and `Pragma` in addition to `cache: 'no-store'` to mitigate Chrome (and similar) showing stale tra cứu while another browser sees fresh data. Documented: UI shows **Chưa công bố** only for null/empty; numeric **0** or text **"0"** still displays as published zero — fix in DB with explicit `NULL` on roster columns. Git: `bbc267c`.
 - **Production reset (Chủ nhật)**: All `Số câu đúng` / `Điểm` on `DS_Sun_Midterm.csv` set to NULL; all rows deleted from `exam_responses`. Supabase **Realtime** turned on for both tables in the dashboard. **Note:** The Next.js app does not call `.channel()` / subscriptions — tra cứu still loads scores on each search via PostgREST `select`; Realtime is optional for future live UI or external tooling. Documented in git commit `bc78112` (pushed to `main`).
 - **Lookup deploy debug**: `next.config.ts` exposes `NEXT_PUBLIC_APP_GIT_SHA` (Vercel `VERCEL_GIT_COMMIT_SHA`); `/lookup` shows **Phiên bản: abc1234** to confirm production bundle. `createClient` uses `fetch` with `cache: 'no-store'` plus `Cache-Control` / `Pragma` headers. Added `supabase_sun_disable_autosync_trigger.sql` — `DISABLE TRIGGER trigger_sun_midterm_on_exam` stops inserts from rewriting `DS_Sun_Midterm.csv` after manual NULL.
