@@ -18,25 +18,52 @@ function shuffleArray<T>(array: T[], seed: number): T[] {
   return shuffled
 }
 
-// Create question with choices in original A, B, C, D order (no shuffling)
-function createQuestion(question: Question): ShuffledQuestion {
-  const choices = [
-    { letter: 'A', text: question['Lựa chọn A'] },
-    { letter: 'B', text: question['Lựa chọn B'] },
-    { letter: 'C', text: question['Lựa chọn C'] },
-    { letter: 'D', text: question['Lựa chọn D'] }
+type ChoiceSlot = { originalLetter: 'A' | 'B' | 'C' | 'D'; text: string }
+
+const DISPLAY_LETTERS: Array<'A' | 'B' | 'C' | 'D'> = ['A', 'B', 'C', 'D']
+
+function normalizeCorrectLetter(raw: string): 'A' | 'B' | 'C' | 'D' {
+  const u = String(raw ?? '')
+    .trim()
+    .toUpperCase()
+    .slice(0, 1)
+  if (u === 'A' || u === 'B' || u === 'C' || u === 'D') return u
+  return 'A'
+}
+
+/** Shuffle the four options per question; letters A–D label positions after shuffle. Seeded by version + index so each đề is stable. */
+function createQuestion(
+  question: Question,
+  testVersion: number,
+  questionIndexInTest: number
+): ShuffledQuestion {
+  const slots: ChoiceSlot[] = [
+    { originalLetter: 'A', text: question['Lựa chọn A'] },
+    { originalLetter: 'B', text: question['Lựa chọn B'] },
+    { originalLetter: 'C', text: question['Lựa chọn C'] },
+    { originalLetter: 'D', text: question['Lựa chọn D'] }
   ]
-  
-  // Keep choices in original A, B, C, D order
-  const correctAnswer = question['Đáp án đúng']
-  
+
+  const originalCorrectAnswer = normalizeCorrectLetter(question['Đáp án đúng'])
+
+  const perQuestionSeed = 50000 + testVersion * 10000 + questionIndexInTest * 97
+  const shuffledSlots = shuffleArray([...slots], perQuestionSeed)
+
+  const displayChoices = shuffledSlots.map((slot, i) => ({
+    letter: DISPLAY_LETTERS[i],
+    text: slot.text
+  }))
+
+  const correctPos = shuffledSlots.findIndex((s) => s.originalLetter === originalCorrectAnswer)
+  const shuffledCorrectAnswer = DISPLAY_LETTERS[correctPos >= 0 ? correctPos : 0]
+
   return {
-    id: 0, // Will be set when questions are assembled
+    id: 0,
     text: question['Text đáp án'],
-    choices: choices.map(c => c.text),
-    originalCorrectAnswer: correctAnswer,
-    shuffledCorrectAnswer: correctAnswer, // Same as original since we don't shuffle
-    displayChoices: choices.map(c => ({ letter: c.letter, text: c.text }))
+    choices: displayChoices.map((c) => c.text),
+    originalCorrectAnswer,
+    shuffledCorrectAnswer,
+    displayChoices
   }
 }
 
@@ -104,10 +131,9 @@ export async function generateFixedTests(): Promise<TestVersion[]> {
       
       // Take first 40 questions for this version
       const versionQuestions = versionShuffled.slice(0, questionsPerTest)
-      
-      // Create questions with A, B, C, D in original order (no shuffling)
+
       const versionTestQuestions = versionQuestions.map((q, index) => ({
-        ...createQuestion(q),
+        ...createQuestion(q, version, index),
         id: index + 1 // Question numbers 1-40
       }))
       

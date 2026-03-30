@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: troubleshooting — “cập nhật chậm 30ph” vs cache/DB timing, không phải độ trễ PostgREST)
+**Last Updated:** March 28, 2026 (Latest: exam — xáo trộn thứ tự 4 đáp án A–D theo từng câu, seed theo đề + chỉ số câu)
 
 ## 🎯 Core Features
 
@@ -18,7 +18,7 @@
 - ✅ Browser autocomplete disabled for privacy
 
 ### Online Exam System
-- ✅ Four fixed 40-question sets from 87-question bank (seeded shuffle per version in `examGenerator.ts`; choices stay A–D order)
+- ✅ Four fixed 40-question sets from 87-question bank; **per-question** shuffle of four choices with deterministic seed (`examGenerator.ts` — labels A–D apply to positions after shuffle)
 - ✅ 4 test versions; assignment via browser `localStorage` counter (not server-side per student)
 - ✅ One row per MSV in `exam_responses` enforced at start (`getExamResponse`)
 - ✅ Automatic scoring (0.25 points per correct answer)
@@ -201,8 +201,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 ### Exam Generator (src/lib/examGenerator.ts)
 - Fetches 87 questions from Supabase
-- Randomly selects 40 questions using fixed seed
-- Creates 4 test versions with shuffled choices
+- Selects 40 questions per version via seeded pool shuffle (4 versions)
+- **Shuffles the four options (A–D content) per question** with seed `f(version, questionIndex)`; `shuffledCorrectAnswer` maps đáp án đúng to the displayed letter
 - Uses seedrandom for deterministic randomization
 
 ### Exam Storage (src/lib/examStorage.ts)
@@ -218,7 +218,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 ## 🔄 Data flow: thi online → điểm trên roster → tra cứu
 
-1. **`/exam` (client):** SV nhập tên + MSV → `getExamResponse` kiểm tra `exam_responses` theo `student_id`; nếu đã có bản ghi thì chặn làm lại (một MSV toàn hệ thống, không tách lớp). Đề 1–4: `localStorage` counter `(n % 4) + 1` trên từng trình duyệt. Câu hỏi: `test_library_lec1_lec6.csv` → 4 bộ 40 câu (seed cố định trong `examGenerator.ts`). Nộp bài: `saveExamResponse` chấm 0.25/câu → **INSERT** `exam_responses` (`student_name`, `student_id`, `test_version`, `responses`, `total_score`).
+1. **`/exam` (client):** SV nhập tên + MSV → `getExamResponse` kiểm tra `exam_responses` theo `student_id`; nếu đã có bản ghi thì chặn làm lại (một MSV toàn hệ thống, không tách lớp). Đề 1–4: `localStorage` counter `(n % 4) + 1` trên từng trình duyệt. Câu hỏi: `test_library_lec1_lec6.csv` → 4 bộ 40 câu + **xáo thứ tự 4 phương án A–D mỗi câu** (seed theo số đề + chỉ số câu trong `examGenerator.ts`). Nộp bài: `saveExamResponse` chấm 0.25/câu → **INSERT** `exam_responses` (`student_name`, `student_id`, `test_version`, `responses`, `total_score`).
 
 2. **PostgreSQL (tùy script đã chạy trên Supabase):** **AFTER INSERT** trên `exam_responses` có thể kích hoạt:
    - `supabase_enable_auto_update.sql` → **upsert** `DS_Fri_1_2_Midterm.csv` (Thứ 6) theo `MSV` / `student_id`.
@@ -410,6 +410,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Exam answer shuffle**: `createQuestion` in `src/lib/examGenerator.ts` now Fisher–Yates shuffles the four choice texts per question (deterministic seed from `testVersion` + `questionIndex`); displayed A–D label positions after shuffle; `shuffledCorrectAnswer` updated for grading (`examStorage` unchanged). Fixes “đề không xáo trộn” (previously only the 40-question set varied per version).
 - **Ops note**: User observed MSV 11183366 eventually showing **Chưa công bố** after ~30min — interpreted as slow server update; documented that Postgres read path is immediate once row is NULL; perceived delay aligns with cache / when DB was updated / when user re-searched.
 - **RLS role target**: `DS_Thurs _7_8_Midterm.csv` may use `SELECT` **TO public**; `DS_Sun_Midterm.csv` uses **TO anon, authenticated** — both allow anon lookup; documented as equivalent pattern, optional cosmetic alignment only.
 - **DS_Sun_Midterm.csv RLS**: Production policy **Allow public read on DS_Sun_Midterm** — `SELECT` for `anon`, `authenticated` — documented in Database Schema; sufficient for lookup; not the cause of stale/wrong score issues when policy is present.
