@@ -150,6 +150,21 @@ export async function generateFixedTests(): Promise<TestVersion[]> {
   }
 }
 
+/**
+ * Gán đề 1–4 theo MSV: phân tán SV khác nhau ra các bộ 40 câu khác nhau;
+ * cùng MSV luôn cùng đề (ổn định khi refresh trước khi nộp).
+ * (Trước đây dùng localStorage — mọi phiên mới đều bắt đầu counter → hầu hết cùng một đề.)
+ */
+export function testVersionFromStudentId(studentId: string): number {
+  const id = studentId.trim()
+  let h = 2166136261
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (Math.abs(h) % 4) + 1
+}
+
 // Get a specific test version (1-4)
 export async function getTestVersion(version: number): Promise<TestVersion> {
   const allTests = await generateFixedTests()

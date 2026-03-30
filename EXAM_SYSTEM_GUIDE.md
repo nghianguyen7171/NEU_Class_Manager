@@ -142,7 +142,7 @@ src/
 
 **page.tsx (exam)**
 - 3-phase UI: Entry → Exam → Completion
-- Sequential test assignment
+- Test version 1–4 assigned from MSV hash (`testVersionFromStudentId`)
 - One-time access enforcement
 - Automatic scoring on submission
 

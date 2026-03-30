@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getTestVersion } from '@/lib/examGenerator'
+import { getTestVersion, testVersionFromStudentId } from '@/lib/examGenerator'
 import { saveExamResponse, getExamResponse } from '@/lib/examStorage'
 import type { ShuffledQuestion } from '@/lib/types'
 
@@ -47,12 +47,7 @@ export default function ExamPage() {
       // Continue anyway
     }
 
-    // Assign test version sequentially
-    let counter = parseInt(localStorage.getItem('exam_counter') || '0')
-    counter++
-    const assignedVersion = (counter % 4) + 1 // Cycles through 1-4
-    localStorage.setItem('exam_counter', counter.toString())
-    
+    const assignedVersion = testVersionFromStudentId(studentId.trim())
     setTestVersion(assignedVersion)
 
     try {
