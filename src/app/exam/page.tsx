@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getTestVersion, testVersionFromStudentId } from '@/lib/examGenerator'
+import { getTestVersion } from '@/lib/examGenerator'
 import { saveExamResponse, getExamResponse } from '@/lib/examStorage'
+import { supabase } from '@/lib/supabase'
 import type { ShuffledQuestion } from '@/lib/types'
 
 export default function ExamPage() {
@@ -47,12 +48,28 @@ export default function ExamPage() {
       // Continue anyway
     }
 
-    const assignedVersion = testVersionFromStudentId(studentId.trim())
-    setTestVersion(assignedVersion)
-
     try {
+      const { data: assignedVersion, error: assignError } = await supabase.rpc(
+        'assign_test_version',
+        { p_student_id: studentId.trim() }
+      )
+
+      if (assignError || !assignedVersion) {
+        console.error('Error assigning test version:', assignError)
+        setError('Không thể gán đề thi. Vui lòng thử lại.')
+        return
+      }
+
+      const normalizedVersion = Number(assignedVersion)
+      if (![1, 2, 3, 4].includes(normalizedVersion)) {
+        setError('Lỗi dữ liệu đề thi. Vui lòng thử lại.')
+        return
+      }
+
+      setTestVersion(normalizedVersion)
+
       // Load questions for assigned version
-      const testQuestions = await getTestVersion(assignedVersion)
+      const testQuestions = await getTestVersion(normalizedVersion)
       setQuestions(testQuestions)
       setExamStarted(true)
     } catch (err) {
