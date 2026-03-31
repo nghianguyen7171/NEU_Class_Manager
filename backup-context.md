@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 28, 2026 (Latest: exam — đề 1–4 gán theo MSV, không còn localStorage khiến cả lớp cùng đề)
+**Last Updated:** March 31, 2026 (Latest: lookup now only CLC66D + Chủ nhật; old class connections removed)
 
 ## 🎯 Core Features
 
@@ -411,6 +411,9 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### March 2026
+- **Lookup class scope update**: `src/app/lookup/page.tsx` now keeps only `CLC66D` (`DS_wed_CLC66D_Midterm.csv`) and `Chủ nhật` (`DS_Sun_Midterm.csv`) in `CLASS_TABLE_MAPPING` and dropdown; default/reset class switched to `CLC66D`. `src/components/ConnectionTest.tsx` now tests only these two tables.
+- **New class SQL pack (CLC66D)**: Added `supabase_create_wed_clc66d_midterm_table.sql` (table + RLS + SELECT policy), `supabase_import_wed_clc66d_midterm.sql` (staging import + upsert normalize), and `supabase_verify_wed_clc66d_midterm.sql` (row/dup/sample checks) for new roster `DS_wed_CLC66D_Midterm.csv`.
+- **New class roster normalization**: Converted `DS_wed_CLC66D.xlsx` to upload-ready `DS_wed_CLC66D_Midterm.csv` with schema `Tên, MSV, Số câu đúng, Điểm`; removed non-required `STT`, kept 51 unique MSV rows, initialized score columns as empty for unpublished state.
 - **Exam version per student**: Replaced `localStorage` `exam_counter` with `testVersionFromStudentId()` (FNV-style hash of MSV → 1–4) so students are spread across four 40-question decks; fixes all first-time sessions getting the same `(counter % 4) + 1` after counter `0→1`.
 - **Exam answer shuffle**: `createQuestion` in `src/lib/examGenerator.ts` now Fisher–Yates shuffles the four choice texts per question (deterministic seed from `testVersion` + `questionIndex`); displayed A–D label positions after shuffle; `shuffledCorrectAnswer` updated for grading (`examStorage` unchanged). Fixes “đề không xáo trộn” (previously only the 40-question set varied per version).
 - **Ops note**: User observed MSV 11183366 eventually showing **Chưa công bố** after ~30min — interpreted as slow server update; documented that Postgres read path is immediate once row is NULL; perceived delay aligns with cache / when DB was updated / when user re-searched.
