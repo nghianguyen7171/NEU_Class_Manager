@@ -3,16 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getTestVersion } from '@/lib/examGenerator'
-import { saveExamResponse, getExamResponse } from '@/lib/examStorage'
-import { supabase } from '@/lib/supabase'
+import { generateFinalExam } from '@/lib/examGenerator'
+import { saveFinalExamResponse, getFinalExamResponse } from '@/lib/examStorage'
 import type { ShuffledQuestion } from '@/lib/types'
 
 export default function ExamPage() {
   // State management
   const [studentName, setStudentName] = useState('')
   const [studentId, setStudentId] = useState('')
-  const [testVersion, setTestVersion] = useState<number | null>(null)
   const [questions, setQuestions] = useState<ShuffledQuestion[]>([])
   const [studentAnswers, setStudentAnswers] = useState<Record<number, string>>({})
   const [examStarted, setExamStarted] = useState(false)
@@ -36,7 +34,7 @@ export default function ExamPage() {
     setError('')
     
     try {
-      const existingResponse = await getExamResponse(studentId.trim())
+      const existingResponse = await getFinalExamResponse(studentId.trim())
       
       if (existingResponse) {
         setError('Bạn đã hoàn thành bài kiểm tra rồi!')
@@ -49,27 +47,7 @@ export default function ExamPage() {
     }
 
     try {
-      const { data: assignedVersion, error: assignError } = await supabase.rpc(
-        'assign_test_version',
-        { p_student_id: studentId.trim() }
-      )
-
-      if (assignError || !assignedVersion) {
-        console.error('Error assigning test version:', assignError)
-        setError('Không thể gán đề thi. Vui lòng thử lại.')
-        return
-      }
-
-      const normalizedVersion = Number(assignedVersion)
-      if (![1, 2, 3, 4].includes(normalizedVersion)) {
-        setError('Lỗi dữ liệu đề thi. Vui lòng thử lại.')
-        return
-      }
-
-      setTestVersion(normalizedVersion)
-
-      // Load questions for assigned version
-      const testQuestions = await getTestVersion(normalizedVersion)
+      const testQuestions = await generateFinalExam(studentId.trim())
       setQuestions(testQuestions)
       setExamStarted(true)
     } catch (err) {
@@ -97,7 +75,7 @@ export default function ExamPage() {
       return
     }
 
-    if (!testVersion || questions.length === 0) {
+    if (questions.length === 0) {
       setError('Lỗi: Không tìm thấy thông tin bài kiểm tra')
       return
     }
@@ -107,24 +85,15 @@ export default function ExamPage() {
 
     try {
       // Save response to Supabase
-      const result = await saveExamResponse(
+      const result = await saveFinalExamResponse(
         studentName.trim(),
         studentId.trim(),
-        testVersion,
         questions,
         studentAnswers
       )
 
       if (result.success) {
-        // Calculate and display total score
-        let score = 0
-        questions.forEach(q => {
-          const studentAnswer = studentAnswers[q.id]
-          if (studentAnswer === q.shuffledCorrectAnswer) {
-            score += 0.25
-          }
-        })
-        setTotalScore(score)
+        setTotalScore(result.totalScore ?? 0)
         setExamSubmitted(true)
       } else {
         setError(result.error || 'Không thể lưu bài làm. Vui lòng thử lại.')
@@ -195,7 +164,7 @@ export default function ExamPage() {
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-8 py-6">
               <h1 className="text-3xl font-bold text-white text-center">
-                Kiểm tra Giữa Kỳ - Data Science
+                Kiểm tra Cuối Kỳ - Data Science
               </h1>
               <div className="text-center mt-3">
                 <span className="inline-block bg-white bg-opacity-20 text-white px-4 py-2 rounded-full text-lg font-semibold">
@@ -294,9 +263,9 @@ export default function ExamPage() {
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Kiểm tra Giữa Kỳ</h2>
+                <h2 className="text-xl font-bold text-gray-900">Kiểm tra Cuối Kỳ</h2>
                 <p className="text-gray-800 mt-1 font-medium">
-                  {studentName} - MSV: {studentId} - Đề thi số {testVersion}
+                  {studentName} - MSV: {studentId}
                 </p>
               </div>
               <div className="inline-block bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full text-sm font-semibold">
@@ -432,7 +401,7 @@ export default function ExamPage() {
                 <p className="font-semibold mb-2">Thông tin bài làm:</p>
                 <p>Họ và tên: {studentName}</p>
                 <p>MSV: {studentId}</p>
-                <p>Đề thi số: {testVersion}</p>
+                <p>Tổng điểm: {totalScore.toFixed(2)}</p>
               </div>
             </div>
             

@@ -1,6 +1,7 @@
 // Type definitions for the exam system
 
 export interface Question {
+  'Bài giảng'?: string
   'Text đáp án': string
   'Lựa chọn A': string
   'Lựa chọn B': string
@@ -37,5 +38,16 @@ export interface ExamResponse {
   total_score: number
 }
 
+export interface FinalExamResponse {
+  id?: number
+  created_at?: string
+  student_name: string
+  student_id: string
+  responses: string // JSON string containing all 40 Q&A
+  total_score: number
+  num_correct: number
+}
+
 export type TestVersion = ShuffledQuestion[]
+export type ExamKind = 'midterm' | 'final'
 

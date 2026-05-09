@@ -5,30 +5,37 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** March 31, 2026 (Latest: exam version allocation moved to Supabase RPC round-robin with one fixed version per MSV)
+**Last Updated:** May 9, 2026 (final exam stratified build + final rosters)
 
 ## 🎯 Core Features
 
 ### Score Lookup System
-- ✅ Multi-class exam score lookup
-- ✅ Class selection dropdown (Thứ 5, tiết 7-8 / Thứ 4, tiết 5-6 / Thứ 6, tiết 1-2 / Chủ nhật)
+- ✅ Exam score lookup for **CLC66D** and **Chủ nhật** with exam-term switch (**Giữa kỳ/Cuối kỳ**)
+- ✅ Class + term selection maps to 4 roster tables:
+  - Midterm: `DS_wed_CLC66D_Midterm.csv`, `DS_Sun_Midterm.csv`
+  - Final: `DS_wed_CLC66D_Final.csv`, `DS_Sun_Final.csv`
 - ✅ Student search by name (Tên) and student ID (MSV)
-- ✅ Dynamic table querying based on selected class
-- ✅ Real-time database query with Supabase
+- ✅ PostgREST `select` on the chosen roster table (no merge with `exam_responses`)
+- ✅ Anti-stale `fetch` headers in `supabase.ts` (`cache: 'no-store'`, `Cache-Control`, `Pragma`)
 - ✅ Browser autocomplete disabled for privacy
 
 ### Online Exam System
 - ✅ Four fixed 40-question sets from 87-question bank; **per-question** shuffle of four choices with deterministic seed (`examGenerator.ts` — labels A–D apply to positions after shuffle)
-- ✅ 4 test versions; assignment via `testVersionFromStudentId(MSV)` (deterministic hash, spread across students)
+- ✅ 4 test versions; assignment via Supabase RPC **`assign_test_version(p_student_id)`** — global round-robin `1→2→3→4→1` with **one fixed version per MSV** (tables `exam_assignments`, `exam_version_counter`; see `supabase_exam_version_allocator.sql`)
 - ✅ One row per MSV in `exam_responses` enforced at start (`getExamResponse`)
 - ✅ Automatic scoring (0.25 points per correct answer)
 - ✅ Response storage with detailed tracking in `exam_responses`
+- ℹ️ `testVersionFromStudentId()` remains in `examGenerator.ts` for reference/scripts; **`/exam` does not use it** for version selection.
+- ✅ Final exam flow uses `final_exam_all` question bank with lecture-stratified randomization:
+  - Quotas: Lec1:5, Lec2:6, Lec3:6, Lec4:6, Lec5:5, Lec6:5, Lec7:5, Lec8:2
+  - One fixed final exam per MSV via `seedFromStudentId(MSV)` (`FINAL_EXAM_SALT`)
+  - Submission saved in `final_exam_responses` (separate from midterm table)
 
 ### User Interface
 - ✅ Professional, responsive UI with enhanced styling
 - ✅ Vietnamese text support with UTF-8 encoding
 - ✅ Comprehensive error handling and loading states
-- ✅ Multi-table connection testing capabilities
+- ✅ Connection test on the **two** lookup roster tables (CLC66D + Chủ nhật)
 - ✅ High contrast input fields for better visibility
 - ✅ Accessibility features (ARIA labels, keyboard navigation)
 - ✅ Navigation between score lookup and exam pages
@@ -93,6 +100,19 @@
 ├── README.md                     # Project documentation
 ├── deploy.md                     # Deployment instructions
 ├── PROJECT_SUMMARY.md            # Project summary
+├── supabase_setup.sql            # exam_responses + RLS
+├── supabase_exam_version_allocator.sql  # RPC assign_test_version + counter/assignments
+├── supabase_wed_clc66d_midterm_sync.sql # CLC66D roster sync from exam_responses (trigger)
+├── supabase_create_wed_clc66d_midterm_table.sql
+├── supabase_import_wed_clc66d_midterm.sql
+├── supabase_verify_wed_clc66d_midterm.sql
+├── supabase_sun_midterm_sync.sql # Chủ nhật roster sync (trigger)
+├── supabase_create_final_exam_all.sql
+├── supabase_create_final_exam_responses.sql
+├── supabase_create_wed_clc66d_final_table.sql
+├── supabase_create_sun_final_table.sql
+├── supabase_wed_clc66d_final_sync.sql
+├── supabase_sun_final_sync.sql
 └── backup-context.md             # This file
 ```
 
@@ -106,37 +126,29 @@
 ### Supabase Database
 - **Project URL:** https://asxhozsfmlmsrflmzizr.supabase.co
 - **Anon Key:** eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzeGhvenNmbWxtc3JmbG16aXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Njc2OTAsImV4cCI6MjA3NTE0MzY5MH0.EpsZVx-IPkH078KCeW-YCI_RWhs46LrgbujalXvf48Q
-- **Table Name:** `DS_Thurs _7_8_Midterm.csv`
+- **Lookup tables (current app):** `DS_wed_CLC66D_Midterm.csv`, `DS_Sun_Midterm.csv`
 
 ### Database Schema
 
-**Score Lookup Tables:**
+**Score lookup tables (used by `/lookup` and `ConnectionTest`):**
 
-**Table 1:** `DS_Thurs _7_8_Midterm.csv` (Thứ 5, tiết 7-8)
+**CLC66D:** `DS_wed_CLC66D_Midterm.csv` — roster + published scores (`Tên`, `MSV`, `Số câu đúng`, `Điểm`). Created/managed with `supabase_create_wed_clc66d_midterm_table.sql`; optional **AFTER INSERT** on `exam_responses` → `supabase_wed_clc66d_midterm_sync.sql`.
+
 ```sql
-create table public."DS_Thurs _7_8_Midterm.csv" (
+CREATE TABLE IF NOT EXISTS public."DS_wed_CLC66D_Midterm.csv" (
   "Tên" text null,
   "MSV" bigint not null,
   "Số câu đúng" text null,
   "Điểm" text null,
-  constraint DS_Thurs _7_8_Midterm.csv_pkey primary key ("MSV")
-) TABLESPACE pg_default;
+  CONSTRAINT "DS_wed_CLC66D_Midterm.csv_pkey" PRIMARY KEY ("MSV")
+);
 ```
 
-**Table 2:** `DS_Wed _5_6_Midterm.csv` (Thứ 4, tiết 5-6)
-```sql
-create table public."DS_Wed _5_6_Midterm.csv" (
-  "Tên" text null,
-  "MSV" bigint not null,
-  "Số câu đúng" text null,
-  "Điểm" text null,
-  constraint DS_Wed _5_6_Midterm.csv_pkey primary key ("MSV")
-) TABLESPACE pg_default;
-```
+**Chủ nhật:** `DS_Sun_Midterm.csv` — cùng kiểu cột roster. **RLS (typical):** policy **Allow public read on DS_Sun_Midterm** — `SELECT` cho **`anon`, `authenticated`**. Cập nhật điểm từ trigger `update_sun_midterm_from_exam_response` (thường `SECURITY DEFINER`); client anon chỉ cần `SELECT`.
 
-**Table (Chủ nhật):** `DS_Sun_Midterm.csv` — cùng kiểu cột roster (`Tên`, `MSV`, `Số câu đúng`, `Điểm`). **RLS (production):** policy **Allow public read on DS_Sun_Midterm** — `SELECT` cho **`anon`, `authenticated`** — đủ cho `/lookup` khi app dùng anon key. Cập nhật điểm từ trigger `update_sun_midterm_from_exam_response` (thường `SECURITY DEFINER`) không cần policy INSERT/UPDATE cho client.
+**Exam version allocation (server):** `exam_version_counter` (singleton pointer), `exam_assignments` (`student_id` → `test_version`), function `assign_test_version(text)` — see `supabase_exam_version_allocator.sql`.
 
-**So sánh với Thứ 5:** `DS_Thurs _7_8_Midterm.csv` có thể dùng policy kiểu **Enable read access for all users** — `SELECT` cho role **`public`** (trong PostgreSQL = mọi role, gồm `anon` và `authenticated`). **Khác `TO public` vs `TO anon, authenticated`** là cách gán role trên policy; với `USING (true)` cả hai đều cho phép client anon đọc bảng — **không** giải thích chênh lệch điểm giữa các trình duyệt. Có thể thống nhất một kiểu (public hoặc anon+authenticated) cho dễ quản lý.
+**Legacy / other roster tables (may still exist in DB; not in current lookup dropdown):** e.g. `DS_Thurs _7_8_Midterm.csv`, `DS_Wed _5_6_Midterm.csv`, `DS_Fri_1_2_Midterm.csv` — same column shape where used historically. RLS patterns (`TO public` vs `TO anon, authenticated`) are equivalent for anon read when `USING (true)`; they do **not** explain score differences between browsers (cache/UI state does).
 
 **Exam System Tables:**
 
@@ -164,18 +176,18 @@ create table public."DS_Wed _5_6_Midterm.csv" (
 
 ### Score Lookup Page (src/app/lookup/page.tsx)
 - Form handling for student name and ID input
-- Multiple search strategies for database queries
-- Error handling and loading states
-- Responsive UI with TailwindCSS
-- Browser autocomplete disabled
-- Real-time results display with enhanced visuals
+- Class dropdown: **CLC66D** / **Chủ nhật** → `CLASS_TABLE_MAPPING` to roster table
+- Search strategies: exact trim, MSV as string, name `ilike`
+- Error handling and loading states; optional git SHA “Phiên bản” on page when env set
+- Responsive UI with TailwindCSS; browser autocomplete disabled
+- Results display with “Chưa công bố” for null/empty score fields
 
 ### Exam Page (src/app/exam/page.tsx)
 - 3-phase exam interface (entry, exam, completion)
 - 40-question single-scroll layout
 - Automatic scoring with instant results
 - One-time access enforcement
-- Test version 1–4 from `testVersionFromStudentId(MSV)` (not `localStorage`)
+- Test version 1–4 from **`supabase.rpc('assign_test_version', { p_student_id })`** before `getTestVersion(version)` (not `localStorage`, not client hash)
 
 ### Database Client (src/lib/supabase.ts)
 ```typescript
@@ -201,7 +213,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 ### Exam Generator (src/lib/examGenerator.ts)
 - Fetches 87 questions from Supabase
-- `testVersionFromStudentId(studentId)` → đề 1–4 per MSV
+- `getTestVersion(version)` loads one of four fixed 40-question sets (version from RPC on `/exam`)
+- `testVersionFromStudentId(studentId)` — legacy hash helper **not** used by the exam page for assignment
 - Selects 40 questions per version via seeded pool shuffle (4 versions)
 - **Shuffles the four options (A–D content) per question** with seed `f(version, questionIndex)`; `shuffledCorrectAnswer` maps đáp án đúng to the displayed letter
 - Uses seedrandom for deterministic randomization
@@ -213,20 +226,29 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 - Prevents duplicate submissions
 
 ### Connection Test Component (src/components/ConnectionTest.tsx)
-- Database connectivity testing
+- Tests 4 roster tables by exam term: `DS_wed_CLC66D_Midterm.csv`, `DS_Sun_Midterm.csv`, `DS_wed_CLC66D_Final.csv`, `DS_Sun_Final.csv`
 - Error reporting for troubleshooting
-- User-friendly interface for debugging
 
 ## 🔄 Data flow: thi online → điểm trên roster → tra cứu
 
-1. **`/exam` (client):** SV nhập tên + MSV → `getExamResponse` kiểm tra `exam_responses` theo `student_id`; nếu đã có bản ghi thì chặn làm lại (một MSV toàn hệ thống, không tách lớp). **Đề 1–4:** `testVersionFromStudentId(MSV)` trong `examGenerator.ts` (hash MSV → phân tán bộ 40 câu; tránh lỗi cũ: `localStorage` khiến mọi phiên đầu cùng một đề). Câu hỏi: `test_library_lec1_lec6.csv` → 4 bộ 40 câu + **xáo thứ tự 4 phương án A–D mỗi câu** (seed theo số đề + chỉ số câu trong `examGenerator.ts`). Nộp bài: `saveExamResponse` chấm 0.25/câu → **INSERT** `exam_responses` (`student_name`, `student_id`, `test_version`, `responses`, `total_score`).
+> Current production flow supports both midterm and final exam.
+
+1. **`/exam` (client):** SV nhập tên + MSV → `getExamResponse` kiểm tra `exam_responses` theo `student_id`; nếu đã có bản ghi thì chặn làm lại (một MSV toàn hệ thống, không tách lớp). **Đề 1–4:** RPC **`assign_test_version(p_student_id)`** (Postgres: round-robin toàn cục, mỗi MSV một đề cố định lần đầu; bảng `exam_assignments` / `exam_version_counter`). Sau đó `getTestVersion(version)` trong `examGenerator.ts`. Câu hỏi: `test_library_lec1_lec6.csv` → 4 bộ 40 câu + **xáo thứ tự 4 phương án A–D mỗi câu**. Nộp bài: `saveExamResponse` chấm 0.25/câu → **INSERT** `exam_responses` (`student_name`, `student_id`, `test_version`, `responses`, `total_score`).
 
 2. **PostgreSQL (tùy script đã chạy trên Supabase):** **AFTER INSERT** trên `exam_responses` có thể kích hoạt:
-   - `supabase_enable_auto_update.sql` → **upsert** `DS_Fri_1_2_Midterm.csv` (Thứ 6) theo `MSV` / `student_id`.
-   - `supabase_sun_midterm_sync.sql` → **UPDATE** dòng có sẵn trong `DS_Sun_Midterm.csv` khi `TRIM(MSV) = TRIM(student_id)` (Chủ nhật).
-   Thứ 5 / Thứ 4: bảng `DS_Thurs_*`, `DS_Wed_*` **không** được repo nối tự động từ `exam_responses` — điểm thường nhập/import thủ công.
+   - `supabase_wed_clc66d_midterm_sync.sql` → cập nhật `DS_wed_CLC66D_Midterm.csv` khi MSV khớp (CLC66D).
+   - `supabase_sun_midterm_sync.sql` → **UPDATE** dòng trong `DS_Sun_Midterm.csv` khi `TRIM(MSV) = TRIM(student_id)` (Chủ nhật).
+   - (Tuỳ dự án cũ) `supabase_enable_auto_update.sql` → `DS_Fri_1_2_Midterm.csv`; các bảng Thứ 5 / Thứ 4 legacy **không** được app lookup hiện tại dùng.
 
-3. **`/lookup` (client):** Chọn lớp → `CLASS_TABLE_MAPPING` → `.select` các cột `Tên`, `MSV`, `Số câu đúng`, `Điểm` trên **đúng bảng lớp**. **Không** merge `exam_responses`. `NULL`/rỗng → UI “Chưa công bố”; `0` hoặc `"0"` vẫn là điểm đã công bố.
+3. **`/lookup` (client):** Chọn **CLC66D** hoặc **Chủ nhật** → `CLASS_TABLE_MAPPING` → `.select` các cột `Tên`, `MSV`, `Số câu đúng`, `Điểm` trên **đúng bảng roster**. **Không** merge `exam_responses`. `NULL`/rỗng → UI “Chưa công bố”; `0` hoặc `"0"` vẫn là điểm đã công bố.
+
+4. **Final exam mode (`/exam`):** `generateFinalExam(studentId)` fetches `final_exam_all`, picks 40 questions with fixed per-lecture quotas (5/6/6/6/5/5/5/2), then shuffles answer options per question. Submission uses `saveFinalExamResponse` → **INSERT** `final_exam_responses` (`student_name`, `student_id`, `responses`, `total_score`, `num_correct`).
+
+5. **Final roster sync:** `AFTER INSERT` on `final_exam_responses` updates both `DS_wed_CLC66D_Final.csv` and `DS_Sun_Final.csv` through `supabase_wed_clc66d_final_sync.sql` and `supabase_sun_final_sync.sql`.
+
+6. **Lookup term switch:** `/lookup` now chooses table by `{examTerm, class}`:
+   - Midterm: `DS_wed_CLC66D_Midterm.csv`, `DS_Sun_Midterm.csv`
+   - Final: `DS_wed_CLC66D_Final.csv`, `DS_Sun_Final.csv`
 
 ## 🚀 Deployment Information
 
@@ -288,10 +310,10 @@ npm run lint         # Code linting
 ## 🔧 Recent Changes & Fixes
 
 ### Latest Updates
-1. **Fixed table mapping** - Corrected class-to-table mapping (Thứ 5, tiết 7-8 → DS_Thurs _7_8_Midterm.csv)
+1. **Lookup scope** - UI tra cứu chỉ **CLC66D** + **Chủ nhật**; mapping tới `DS_wed_CLC66D_Midterm.csv` / `DS_Sun_Midterm.csv`
 2. **Updated page title** - Changed browser tab to "NEU Class Manager" (simplified from "NEU Class Manager - Tra Cứu Điểm Thi")
 3. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
-4. **Multi-table connection testing** - ConnectionTest tests all score tables including DS_Fri_1_2_Midterm.csv and DS_Sun_Midterm.csv (Chủ nhật)
+4. **Connection testing** - ConnectionTest chỉ kiểm tra hai bảng roster trên (CLC66D + Chủ nhật)
 5. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
 6. **Enhanced results display** - Better visual hierarchy with card-based layout
 7. **Background image** - Added bg.jpg with 30% opacity overlay for better visibility
@@ -343,9 +365,9 @@ npm run lint         # Code linting
 
 ### ✅ Completed
 - Database connection established
-- Score lookup functionality working
+- Score lookup (CLC66D + Chủ nhật) working
 - Online exam system implemented
-- 4 test versions with randomized questions
+- 4 test versions; server-side round-robin assignment via `assign_test_version`
 - Automatic grading system
 - Response storage to Supabase
 - UI/UX optimized
@@ -388,8 +410,9 @@ npm run lint         # Code linting
 
 ### Database
 - **Supabase Project:** asxhozsfmlmsrflmzizr
-- **Score Tables:** DS_Thurs _7_8_Midterm.csv, DS_Wed _5_6_Midterm.csv, DS_Fri_1_2_Midterm.csv, DS_Sun_Midterm.csv
-- **Exam Tables:** test_library_lec1_lec6.csv, exam_responses
+- **Lookup roster tables (app):** `DS_wed_CLC66D_Midterm.csv`, `DS_Sun_Midterm.csv`
+- **Other roster tables:** may exist for legacy classes (e.g. Thurs/Wed/Fri CSV-named tables)
+- **Exam Tables:** `test_library_lec1_lec6.csv`, `exam_responses`; allocator: `exam_version_counter`, `exam_assignments`
 
 ---
 
@@ -410,14 +433,22 @@ This backup context contains all essential information for AI sessions:
 
 ## 📝 Change Log
 
+### May 2026
+- **Final exam stratified rollout**: Implemented final-exam generation from `final_exam_all` with fixed lecture quotas `{Lec1:5, Lec2:6, Lec3:6, Lec4:6, Lec5:5, Lec6:5, Lec7:5, Lec8:2}`, deterministic per-student seed (`seedFromStudentId` + `FINAL_EXAM_SALT`), and separated write path to `final_exam_responses`.
+- **Final roster tables + triggers**: Added `DS_wed_CLC66D_Final.csv`, `DS_Sun_Final.csv`, plus sync scripts `supabase_wed_clc66d_final_sync.sql` / `supabase_sun_final_sync.sql` to project final score onto roster tables after submit.
+- **Lookup multi-term support**: `src/app/lookup/page.tsx` now adds exam-term selector (Giữa kỳ/Cuối kỳ) and table mapping for all 4 roster tables. `src/components/ConnectionTest.tsx` now tests all 4 tables.
+- **Exam page final mode**: `src/app/exam/page.tsx` switched to final flow (`generateFinalExam`, `getFinalExamResponse`, `saveFinalExamResponse`) and no longer depends on `assign_test_version` for final exam assignment.
+- **backup-context.md refresh**: Đồng bộ mô tả với code — tra cứu 2 lớp (CLC66D, Chủ nhật); luồng thi dùng RPC `assign_test_version`; schema ưu tiên `DS_wed_CLC66D_Midterm.csv`; ghi chú bảng legacy và `testVersionFromStudentId` không còn dùng trên `/exam`.
+
 ### March 2026
+- **Allocator operations note**: `exam_version_counter` stores the global “next version” pointer for RPC round-robin assignment. Do **not** delete singleton row `id=1` during normal operation. For a new exam cycle, reset with `UPDATE ... SET next_version = 1`; only clear `exam_assignments` if you intentionally want re-assignment for existing `student_id`s.
 - **Exam version allocator (server-side)**: Added `supabase_exam_version_allocator.sql` with tables `exam_version_counter`, `exam_assignments`, and RPC `assign_test_version(p_student_id)` (`SECURITY DEFINER`) to allocate versions in strict global round-robin `1→2→3→4→1` while keeping one fixed `test_version` per `student_id`.
 - **Exam page RPC integration**: `src/app/exam/page.tsx` now calls `supabase.rpc('assign_test_version', { p_student_id })` before loading questions; removed client-side MSV hash assignment dependency for version selection.
 - **CLC66D score sync trigger**: Added `supabase_wed_clc66d_midterm_sync.sql` with `update_wed_clc66d_midterm_from_exam_response()` + trigger `trigger_wed_clc66d_midterm_on_exam` (`AFTER INSERT` on `exam_responses`) and one-time backfill query to populate `DS_wed_CLC66D_Midterm.csv` from latest attempt per `student_id`.
 - **Lookup class scope update**: `src/app/lookup/page.tsx` now keeps only `CLC66D` (`DS_wed_CLC66D_Midterm.csv`) and `Chủ nhật` (`DS_Sun_Midterm.csv`) in `CLASS_TABLE_MAPPING` and dropdown; default/reset class switched to `CLC66D`. `src/components/ConnectionTest.tsx` now tests only these two tables.
 - **New class SQL pack (CLC66D)**: Added `supabase_create_wed_clc66d_midterm_table.sql` (table + RLS + SELECT policy), `supabase_import_wed_clc66d_midterm.sql` (staging import + upsert normalize), and `supabase_verify_wed_clc66d_midterm.sql` (row/dup/sample checks) for new roster `DS_wed_CLC66D_Midterm.csv`.
 - **New class roster normalization**: Converted `DS_wed_CLC66D.xlsx` to upload-ready `DS_wed_CLC66D_Midterm.csv` with schema `Tên, MSV, Số câu đúng, Điểm`; removed non-required `STT`, kept 51 unique MSV rows, initialized score columns as empty for unpublished state.
-- **Exam version per student**: Replaced `localStorage` `exam_counter` with `testVersionFromStudentId()` (FNV-style hash of MSV → 1–4) so students are spread across four 40-question decks; fixes all first-time sessions getting the same `(counter % 4) + 1` after counter `0→1`.
+- **Exam version per student (intermediate step)**: Replaced `localStorage` `exam_counter` with `testVersionFromStudentId()` (FNV-style hash) — **later superseded** by RPC `assign_test_version` (global round-robin + sticky per MSV). Hash helper still in repo but not used by `/exam` for assignment.
 - **Exam answer shuffle**: `createQuestion` in `src/lib/examGenerator.ts` now Fisher–Yates shuffles the four choice texts per question (deterministic seed from `testVersion` + `questionIndex`); displayed A–D label positions after shuffle; `shuffledCorrectAnswer` updated for grading (`examStorage` unchanged). Fixes “đề không xáo trộn” (previously only the 40-question set varied per version).
 - **Ops note**: User observed MSV 11183366 eventually showing **Chưa công bố** after ~30min — interpreted as slow server update; documented that Postgres read path is immediate once row is NULL; perceived delay aligns with cache / when DB was updated / when user re-searched.
 - **RLS role target**: `DS_Thurs _7_8_Midterm.csv` may use `SELECT` **TO public**; `DS_Sun_Midterm.csv` uses **TO anon, authenticated** — both allow anon lookup; documented as equivalent pattern, optional cosmetic alignment only.
@@ -472,7 +503,7 @@ This backup context contains all essential information for AI sessions:
 - **Logo Integration**: Added NEU, NCT, and FDA logos to all pages, standardized sizes to 150x150
 - **Summary Table Auto-Update**: Enabled automatic trigger for `DS_Fri_1_2_Midterm.csv` table updates
 - **Exam System Refinements**: Reshuffled test bank, hid scores from students after submission
-- **Multi-Class Support**: Added third class option "Thứ 6, tiết 1-2" for online exam results
+- **Multi-Class Support (historic)**: Earlier builds added more class options; **current** lookup UI is CLC66D + Chủ nhật only.
 
 ---
 

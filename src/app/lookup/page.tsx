@@ -28,9 +28,13 @@ function rowToExamScore(raw: Record<string, unknown>): ExamScore {
 
 const SUN_SCORE_TABLE = 'DS_Sun_Midterm.csv'
 const WED_CLC66D_SCORE_TABLE = 'DS_wed_CLC66D_Midterm.csv'
+const SUN_FINAL_SCORE_TABLE = 'DS_Sun_Final.csv'
+const WED_CLC66D_FINAL_SCORE_TABLE = 'DS_wed_CLC66D_Final.csv'
+type ExamTerm = 'midterm' | 'final'
 
 export default function LookupPage() {
   const [selectedClass, setSelectedClass] = useState('CLC66D')
+  const [selectedTerm, setSelectedTerm] = useState<ExamTerm>('final')
   const [studentName, setStudentName] = useState('')
   const [studentId, setStudentId] = useState('')
   const [result, setResult] = useState<ExamScore | null>(null)
@@ -38,15 +42,20 @@ export default function LookupPage() {
   const [error, setError] = useState('')
   const [notFound, setNotFound] = useState(false)
 
-  // Class to table mapping
-  const CLASS_TABLE_MAPPING = {
-    CLC66D: WED_CLC66D_SCORE_TABLE,
-    'Chủ nhật': SUN_SCORE_TABLE
+  const TABLE_BY_TERM_CLASS: Record<ExamTerm, Record<string, string>> = {
+    midterm: {
+      CLC66D: WED_CLC66D_SCORE_TABLE,
+      'Chủ nhật': SUN_SCORE_TABLE
+    },
+    final: {
+      CLC66D: WED_CLC66D_FINAL_SCORE_TABLE,
+      'Chủ nhật': SUN_FINAL_SCORE_TABLE
+    }
   }
 
-  // Helper function to get table name from class
-  const getTableName = (className: string): string => {
-    return CLASS_TABLE_MAPPING[className as keyof typeof CLASS_TABLE_MAPPING] || WED_CLC66D_SCORE_TABLE
+  const getTableName = (term: ExamTerm, className: string): string => {
+    const termMapping = TABLE_BY_TERM_CLASS[term]
+    return termMapping[className] || WED_CLC66D_FINAL_SCORE_TABLE
   }
 
   const scoreDisplay = (value: string | number | null | undefined) => {
@@ -80,7 +89,7 @@ export default function LookupPage() {
 
     try {
       // Get the table name based on selected class
-      const tableName = getTableName(selectedClass)
+      const tableName = getTableName(selectedTerm, selectedClass)
       
       // Try multiple search strategies
       let searchResult = null
@@ -151,6 +160,7 @@ export default function LookupPage() {
   }
 
   const handleReset = () => {
+    setSelectedTerm('final')
     setSelectedClass('CLC66D')
     setStudentName('')
     setStudentId('')
@@ -218,7 +228,7 @@ export default function LookupPage() {
             🔍 Tra Cứu Điểm Thi
           </h1>
           <p className="text-gray-900 text-lg font-semibold">
-            Chọn lớp học và nhập thông tin để tra cứu điểm thi giữa kỳ
+            Chọn kỳ thi, lớp học và nhập thông tin để tra cứu điểm
           </p>
         </div>
 
@@ -228,6 +238,24 @@ export default function LookupPage() {
         {/* Search Form */}
         <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8 mb-8">
           <form onSubmit={handleSearch} className="space-y-6">
+            {/* Exam term selection */}
+            <div>
+              <label htmlFor="termSelect" className="block text-sm font-semibold text-gray-800 mb-2">
+                Kỳ thi *
+              </label>
+              <select
+                id="termSelect"
+                value={selectedTerm}
+                onChange={(e) => setSelectedTerm(e.target.value as ExamTerm)}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white hover:border-gray-400 transition-colors"
+                disabled={loading}
+                aria-label="Chọn kỳ thi"
+              >
+                <option value="final">Cuối kỳ</option>
+                <option value="midterm">Giữa kỳ</option>
+              </select>
+            </div>
+
             {/* Class Selection */}
             <div>
               <label htmlFor="classSelect" className="block text-sm font-semibold text-gray-800 mb-2">

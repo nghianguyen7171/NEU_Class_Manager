@@ -4,6 +4,19 @@ import type { Question, ShuffledQuestion, TestVersion } from './types'
 
 // Cache for generated tests
 let cachedTests: TestVersion[] | null = null
+const FINAL_BANK_TABLE = 'final_exam_all'
+
+export const FINAL_EXAM_SALT = 'NEU-FINAL-2026'
+export const FINAL_LECTURE_QUOTAS: Record<string, number> = {
+  'Lec1 - Introduction to Data Science': 5,
+  'Lec2 - Python Programming': 6,
+  'Lec3 - NumPy & Pandas': 6,
+  'Lec4 - Data Input & Storage': 6,
+  'Lec5 - Data Cleaning & Preparation': 5,
+  'Lec6 - Data Wrangling (Sort/Merge/Reshape)': 5,
+  'Lec7 - Data Visualization': 5,
+  'Lec8 - Supervised Machine Learning': 2
+}
 
 // Helper function to shuffle an array using seeded random
 function shuffleArray<T>(array: T[], seed: number): T[] {
@@ -80,6 +93,73 @@ function decodeHtmlEntities(text: string): string {
   return text.replace(/&[#\w]+;/g, (entity) => entities[entity] || entity)
 }
 
+function fnv1aHash(input: string): number {
+  let h = 2166136261
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return h >>> 0
+}
+
+export function seedFromStudentId(studentId: string): number {
+  const normalizedId = studentId.trim()
+  return fnv1aHash(`${FINAL_EXAM_SALT}::${normalizedId}`)
+}
+
+function decodeQuestion(raw: Question): Question {
+  return {
+    'Bài giảng': raw['Bài giảng'],
+    'Text đáp án': decodeHtmlEntities(raw['Text đáp án']),
+    'Lựa chọn A': decodeHtmlEntities(raw['Lựa chọn A']),
+    'Lựa chọn B': decodeHtmlEntities(raw['Lựa chọn B']),
+    'Lựa chọn C': decodeHtmlEntities(raw['Lựa chọn C']),
+    'Lựa chọn D': decodeHtmlEntities(raw['Lựa chọn D']),
+    'Đáp án đúng': raw['Đáp án đúng'],
+    'Điểm': raw['Điểm']
+  }
+}
+
+export async function generateFinalExam(studentId: string): Promise<TestVersion> {
+  const rootSeed = seedFromStudentId(studentId)
+  const { data, error } = await supabase
+    .from(FINAL_BANK_TABLE)
+    .select('*')
+
+  if (error) {
+    console.error('Error fetching final exam bank:', error)
+    throw error
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error('No final exam questions found in database')
+  }
+
+  const decodedQuestions = (data as Question[]).map(decodeQuestion)
+  const picked: Question[] = []
+
+  for (const [lecture, quota] of Object.entries(FINAL_LECTURE_QUOTAS)) {
+    const pool = decodedQuestions.filter((q) => (q['Bài giảng'] || '').trim() === lecture)
+    if (pool.length < quota) {
+      throw new Error(
+        `Không đủ câu hỏi cho "${lecture}": cần ${quota}, hiện có ${pool.length}.`
+      )
+    }
+
+    const lectureSeed = fnv1aHash(`${rootSeed}::${lecture}`)
+    const lecturePick = shuffleArray(pool, lectureSeed).slice(0, quota)
+    picked.push(...lecturePick)
+  }
+
+  const finalOrderSeed = fnv1aHash(`${rootSeed}::order`)
+  const ordered = shuffleArray(picked, finalOrderSeed)
+
+  return ordered.map((q, index) => ({
+    ...createQuestion(q, 0, index),
+    id: index + 1
+  }))
+}
+
 // Generate 4 fixed test versions
 export async function generateFixedTests(): Promise<TestVersion[]> {
   // Return cached tests if available
@@ -104,15 +184,7 @@ export async function generateFixedTests(): Promise<TestVersion[]> {
     }
     
     // Decode HTML entities in all questions
-    const decodedQuestions: Question[] = questions.map((q: Question) => ({
-      'Text đáp án': decodeHtmlEntities(q['Text đáp án']),
-      'Lựa chọn A': decodeHtmlEntities(q['Lựa chọn A']),
-      'Lựa chọn B': decodeHtmlEntities(q['Lựa chọn B']),
-      'Lựa chọn C': decodeHtmlEntities(q['Lựa chọn C']),
-      'Lựa chọn D': decodeHtmlEntities(q['Lựa chọn D']),
-      'Đáp án đúng': q['Đáp án đúng'],
-      'Điểm': q['Điểm']
-    }))
+    const decodedQuestions: Question[] = questions.map((q: Question) => decodeQuestion(q))
     
     // Generate 4 test versions with minimal question overlap
     // Strategy: Each test gets 40 questions from the 87-question pool

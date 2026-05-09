@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 
 interface TableTestResult {
   tableName: string
+  examTerm: 'Giữa kỳ' | 'Cuối kỳ'
   status: 'success' | 'error'
   recordCount?: number
   error?: string
@@ -19,8 +20,10 @@ export default function ConnectionTest() {
     setTestResults([])
     
     const tablesToTest = [
-      { name: 'DS_wed_CLC66D_Midterm.csv', displayName: 'CLC66D' },
-      { name: 'DS_Sun_Midterm.csv', displayName: 'Chủ nhật' }
+      { name: 'DS_wed_CLC66D_Midterm.csv', displayName: 'CLC66D', examTerm: 'Giữa kỳ' as const },
+      { name: 'DS_Sun_Midterm.csv', displayName: 'Chủ nhật', examTerm: 'Giữa kỳ' as const },
+      { name: 'DS_wed_CLC66D_Final.csv', displayName: 'CLC66D', examTerm: 'Cuối kỳ' as const },
+      { name: 'DS_Sun_Final.csv', displayName: 'Chủ nhật', examTerm: 'Cuối kỳ' as const }
     ]
 
     const results: TableTestResult[] = []
@@ -35,12 +38,14 @@ export default function ConnectionTest() {
         if (error) {
           results.push({
             tableName: table.displayName,
+            examTerm: table.examTerm,
             status: 'error',
             error: error.message
           })
         } else {
           results.push({
             tableName: table.displayName,
+            examTerm: table.examTerm,
             status: 'success',
             recordCount: count || 0
           })
@@ -49,6 +54,7 @@ export default function ConnectionTest() {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
         results.push({
           tableName: table.displayName,
+          examTerm: table.examTerm,
           status: 'error',
           error: errorMessage
         })
@@ -65,7 +71,7 @@ export default function ConnectionTest() {
         🔧 Database Connection Test
       </h3>
       <p className="text-gray-600 mb-4">
-        Test the connection to all exam score tables to diagnose any issues.
+        Test the connection to all midterm/final score tables to diagnose any issues.
       </p>
       <button
         onClick={testAllTables}
@@ -86,7 +92,9 @@ export default function ConnectionTest() {
                     {result.status === 'success' ? '✅' : '❌'}
                   </span>
                   <div>
-                    <h5 className="font-semibold text-gray-800">{result.tableName}</h5>
+                    <h5 className="font-semibold text-gray-800">
+                      {result.tableName} ({result.examTerm})
+                    </h5>
                     {result.status === 'success' && (
                       <p className="text-sm text-gray-600">
                         {result.recordCount} records available
