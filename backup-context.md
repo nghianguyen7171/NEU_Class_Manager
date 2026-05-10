@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** Web app tra cứu điểm và thi online (ưu tiên **Mar3_K56_KTQD**, **Mar12_K56**). **Sample** = roster 5 SV + bảng/trigger như Mar (chỉ để thử quy trình). **CLC66D không thi qua app này** (xem Core Features).  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** May 10, 2026 (+ **Sample** — lớp mẫu 5 SV `DS_Sample_*` để test quy trình; chạy SQL trên Supabase giống Mar12)
+**Last Updated:** May 10, 2026 (Sample class đã push `main` — `11c8f9a`; SQL Supabase đã chạy theo xác nhận user)
 
 ## 🎯 Core Features
 
@@ -466,7 +466,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### May 2026
-- **Lớp Sample (test):** `new_class/DS_Sample_Midterm.csv` — 5 SV (tên mẫu, MSV 99010001–99010005). SQL: `supabase_create_sample_midterm_table.sql`, `supabase_import_sample_midterm.sql`, `supabase_verify_sample_midterm.sql`, `supabase_sample_midterm_sync.sql`, `supabase_create_sample_final_table.sql`, `supabase_sample_final_sync.sql`. `lookup/page.tsx` + `ConnectionTest.tsx`: lớp **Sample (thử nghiệm)**. Thứ tự chạy trên Supabase giống Mar12.
+- **Lớp Sample (test, pushed `11c8f9a`):** `new_class/DS_Sample_Midterm.csv` — 5 SV (tên mẫu, MSV 99010001–99010005). SQL: `supabase_create_sample_midterm_table.sql`, `supabase_import_sample_midterm.sql`, `supabase_verify_sample_midterm.sql`, `supabase_sample_midterm_sync.sql`, `supabase_create_sample_final_table.sql`, `supabase_sample_final_sync.sql`. `lookup/page.tsx` + `ConnectionTest.tsx`: lớp **Sample (thử nghiệm)**. Thứ tự chạy trên Supabase giống Mar12.
 - **Chính sách CLC66D (tài liệu):** Ghi nhận **lớp CLC66D sẽ thi không qua nền tảng này** — **chưa cần** ưu tiên trigger/import/sync hay ConnectionTest cho `DS_wed_CLC66D_*` khi vận hành thi online; phạm vi vận hành **Mar3_K56_KTQD** + **Mar12_K56**. Cập nhật toàn bộ `backup-context.md` cho nhất quán.
 - **Mar12_K56 Supabase + app wiring (pushed `9ebd613`)**: Added roster tables pack — `supabase_create_mar12_k56_midterm_table.sql`, `supabase_import_mar12_k56_midterm.sql`, `supabase_verify_mar12_k56_midterm.sql`, `supabase_mar12_k56_midterm_sync.sql` (trigger on `exam_responses`), `supabase_create_mar12_k56_final_table.sql` (seeds `Tên`/`MSV` from midterm), `supabase_mar12_k56_final_sync.sql` (trigger on `final_exam_responses`). Source data: `new_class/DS_Mar12_K56_Midterm.csv` + `new_class/Kiem-tra-giua-ky-160936565697150978.xlsx` (62 students). Updated `src/app/lookup/page.tsx` (constants, `TABLE_BY_TERM_CLASS`, dropdown **Mar12_K56**), `src/components/ConnectionTest.tsx` (two more table checks), and this `backup-context.md`. **Ops order on Supabase:** (1) create midterm table → (2) import → (3) midterm sync → (4) create final table → (5) final sync. Vercel deploy từ `main` sau commit này; DB đã áp dụng theo xác nhận user.
 - **Sun → Mar3_K56_KTQD (pushed)**: Committed and pushed `235fff0` to `main` (Vercel auto-deploy). **DB step:** run `supabase_rename_sun_to_mar3_k56_ktqd.sql` in Supabase SQL Editor after deploy so table names match the app (see section **Supabase ops: Mar3_K56_KTQD rename** above).
