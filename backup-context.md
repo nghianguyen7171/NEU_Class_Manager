@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** May 10, 2026 (`main` @ `f7c32dd`: Mar12_K56 integration + backup-context; Supabase SQL đã chạy trên production)
+**Last Updated:** May 10, 2026 (Mar12_K56 đã merge lên `main` và push; Supabase SQL đã chạy trên production — xem git log)
 
 ## 🎯 Core Features
 
