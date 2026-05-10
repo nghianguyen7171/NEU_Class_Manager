@@ -29,9 +29,11 @@ function rowToExamScore(raw: Record<string, unknown>): ExamScore {
 const MAR3_SCORE_TABLE = 'DS_Mar3_K56_KTQD_Midterm.csv'
 const WED_CLC66D_SCORE_TABLE = 'DS_wed_CLC66D_Midterm.csv'
 const MAR12_SCORE_TABLE = 'DS_Mar12_K56_Midterm.csv'
+const SAMPLE_SCORE_TABLE = 'DS_Sample_Midterm.csv'
 const MAR3_FINAL_SCORE_TABLE = 'DS_Mar3_K56_KTQD_Final.csv'
 const WED_CLC66D_FINAL_SCORE_TABLE = 'DS_wed_CLC66D_Final.csv'
 const MAR12_FINAL_SCORE_TABLE = 'DS_Mar12_K56_Final.csv'
+const SAMPLE_FINAL_SCORE_TABLE = 'DS_Sample_Final.csv'
 type ExamTerm = 'midterm' | 'final'
 
 export default function LookupPage() {
@@ -48,12 +50,14 @@ export default function LookupPage() {
     midterm: {
       CLC66D: WED_CLC66D_SCORE_TABLE,
       Mar3_K56_KTQD: MAR3_SCORE_TABLE,
-      Mar12_K56: MAR12_SCORE_TABLE
+      Mar12_K56: MAR12_SCORE_TABLE,
+      Sample: SAMPLE_SCORE_TABLE
     },
     final: {
       CLC66D: WED_CLC66D_FINAL_SCORE_TABLE,
       Mar3_K56_KTQD: MAR3_FINAL_SCORE_TABLE,
-      Mar12_K56: MAR12_FINAL_SCORE_TABLE
+      Mar12_K56: MAR12_FINAL_SCORE_TABLE,
+      Sample: SAMPLE_FINAL_SCORE_TABLE
     }
   }
 
@@ -276,6 +280,7 @@ export default function LookupPage() {
                 <option value="CLC66D">CLC66D</option>
                 <option value="Mar3_K56_KTQD">Mar3_K56_KTQD</option>
                 <option value="Mar12_K56">Mar12_K56</option>
+                <option value="Sample">Sample (thử nghiệm)</option>
               </select>
             </div>
             {/* Student Name */}

@@ -3,23 +3,24 @@
 ## 📋 Project Overview
 
 **Project Name:** NEU Class Manager  
-**Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
+**Purpose:** Web app tra cứu điểm và thi online (ưu tiên **Mar3_K56_KTQD**, **Mar12_K56**). **Sample** = roster 5 SV + bảng/trigger như Mar (chỉ để thử quy trình). **CLC66D không thi qua app này** (xem Core Features).  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** May 10, 2026 (Mar12_K56 đã merge lên `main` và push; Supabase SQL đã chạy trên production — xem git log)
+**Last Updated:** May 10, 2026 (+ **Sample** — lớp mẫu 5 SV `DS_Sample_*` để test quy trình; chạy SQL trên Supabase giống Mar12)
 
 ## 🎯 Core Features
 
 ### Score Lookup System
-- ✅ Exam score lookup for **CLC66D**, **Mar3_K56_KTQD** (formerly “Chủ nhật”), and **Mar12_K56** with exam-term switch (**Giữa kỳ/Cuối kỳ**)
-- ✅ Class + term selection maps to 6 roster tables:
-  - Midterm: `DS_wed_CLC66D_Midterm.csv`, `DS_Mar3_K56_KTQD_Midterm.csv`, `DS_Mar12_K56_Midterm.csv`
-  - Final: `DS_wed_CLC66D_Final.csv`, `DS_Mar3_K56_KTQD_Final.csv`, `DS_Mar12_K56_Final.csv`
+- ✅ Exam score lookup for **Mar3_K56_KTQD** (formerly “Chủ nhật”), **Mar12_K56**, và **Sample (thử nghiệm)** với exam-term (**Giữa kỳ/Cuối kỳ**); **CLC66D** trong dropdown là tùy chọn (lớp không thi trên app)
+- ✅ Class + term maps tới roster (tới **8** bảng nếu gồm CLC66D + Sample + 2 lớp Mar):
+  - Midterm: `DS_wed_CLC66D_Midterm.csv` *(tùy chọn)*, `DS_Mar3_K56_KTQD_Midterm.csv`, `DS_Mar12_K56_Midterm.csv`, `DS_Sample_Midterm.csv`
+  - Final: `DS_wed_CLC66D_Final.csv` *(tùy chọn)*, `DS_Mar3_K56_KTQD_Final.csv`, `DS_Mar12_K56_Final.csv`, `DS_Sample_Final.csv`
 - ✅ Student search by name (Tên) and student ID (MSV)
 - ✅ PostgREST `select` on the chosen roster table (no merge with `exam_responses`)
 - ✅ Anti-stale `fetch` headers in `supabase.ts` (`cache: 'no-store'`, `Cache-Control`, `Pragma`)
 - ✅ Browser autocomplete disabled for privacy
 
 ### Online Exam System
+- ℹ️ **Phạm vi lớp:** Luồng `/exam` + `exam_responses` / `final_exam_responses` + trigger roster — **Mar3_K56_KTQD**, **Mar12_K56**, và **Sample** (MSV 99010001–99010005 để test). **CLC66D** không thi qua app.
 - ✅ Four fixed 40-question sets from 87-question bank; **per-question** shuffle of four choices with deterministic seed (`examGenerator.ts` — labels A–D apply to positions after shuffle)
 - ✅ 4 test versions; assignment via Supabase RPC **`assign_test_version(p_student_id)`** — global round-robin `1→2→3→4→1` with **one fixed version per MSV** (tables `exam_assignments`, `exam_version_counter`; see `supabase_exam_version_allocator.sql`)
 - ✅ One row per MSV in `exam_responses` enforced at start (`getExamResponse`)
@@ -35,7 +36,7 @@
 - ✅ Professional, responsive UI with enhanced styling
 - ✅ Vietnamese text support with UTF-8 encoding
 - ✅ Comprehensive error handling and loading states
-- ✅ Connection test on all **six** lookup roster tables (Midterm + Final × CLC66D / Mar3_K56_KTQD / Mar12_K56)
+- ✅ Connection test on **eight** lookup roster tables (CLC66D + Mar3 + Mar12 + Sample × mid/final); ưu tiên kiểm tra Mar3, Mar12, Sample khi test quy trình
 - ✅ High contrast input fields for better visibility
 - ✅ Accessibility features (ARIA labels, keyboard navigation)
 - ✅ Navigation between score lookup and exam pages
@@ -102,7 +103,7 @@
 ├── PROJECT_SUMMARY.md            # Project summary
 ├── supabase_setup.sql            # exam_responses + RLS
 ├── supabase_exam_version_allocator.sql  # RPC assign_test_version + counter/assignments
-├── supabase_wed_clc66d_midterm_sync.sql # CLC66D roster sync from exam_responses (trigger)
+├── supabase_wed_clc66d_midterm_sync.sql # CLC66D roster sync (legacy/optional; lớp CLC66D không thi trên app)
 ├── supabase_create_wed_clc66d_midterm_table.sql
 ├── supabase_import_wed_clc66d_midterm.sql
 ├── supabase_verify_wed_clc66d_midterm.sql
@@ -120,7 +121,14 @@
 ├── supabase_mar12_k56_midterm_sync.sql
 ├── supabase_create_mar12_k56_final_table.sql
 ├── supabase_mar12_k56_final_sync.sql
-├── new_class/DS_Mar12_K56_Midterm.csv   # Source roster (62 SV) for Mar12_K56
+├── supabase_create_sample_midterm_table.sql
+├── supabase_import_sample_midterm.sql
+├── supabase_verify_sample_midterm.sql
+├── supabase_sample_midterm_sync.sql
+├── supabase_create_sample_final_table.sql
+├── supabase_sample_final_sync.sql
+├── new_class/DS_Mar12_K56_Midterm.csv   # Mar12_K56 (62 SV)
+├── new_class/DS_Sample_Midterm.csv      # Sample (5 SV, MSV 99010001–99010005)
 └── backup-context.md             # This file
 ```
 
@@ -134,13 +142,13 @@
 ### Supabase Database
 - **Project URL:** https://asxhozsfmlmsrflmzizr.supabase.co
 - **Anon Key:** eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzeGhvenNmbWxtc3JmbG16aXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Njc2OTAsImV4cCI6MjA3NTE0MzY5MH0.EpsZVx-IPkH078KCeW-YCI_RWhs46LrgbujalXvf48Q
-- **Lookup tables (current app):** `DS_wed_CLC66D_Midterm.csv`, `DS_Mar3_K56_KTQD_Midterm.csv`, `DS_Mar12_K56_Midterm.csv`, `DS_wed_CLC66D_Final.csv`, `DS_Mar3_K56_KTQD_Final.csv`, `DS_Mar12_K56_Final.csv`
+- **Lookup tables (PostgREST / app):** thêm **`DS_Sample_Midterm.csv` / `DS_Sample_Final.csv`** cho lớp mẫu; **`DS_*_Mar3_*` và `DS_*_Mar12_*`** là lớp thật; `DS_wed_CLC66D_*` tùy chọn
 
 ### Database Schema
 
 **Score lookup tables (used by `/lookup` and `ConnectionTest`):**
 
-**CLC66D:** `DS_wed_CLC66D_Midterm.csv` — roster + published scores (`Tên`, `MSV`, `Số câu đúng`, `Điểm`). Created/managed with `supabase_create_wed_clc66d_midterm_table.sql`; optional **AFTER INSERT** on `exam_responses` → `supabase_wed_clc66d_midterm_sync.sql`.
+**CLC66D (tùy chọn / không trong phạm vi thi online):** `DS_wed_CLC66D_Midterm.csv` (và final tương ứng) — cùng schema roster. **Lớp CLC66D thi không qua app này** nên **chưa cần** duy trì trigger hay quy trình import/sync từ `exam_responses`/`final_exam_responses` cho CLC66D, trừ khi sau này đổi kế hoạch. Script lịch sử: `supabase_create_wed_clc66d_midterm_table.sql`, `supabase_wed_clc66d_midterm_sync.sql`, `supabase_wed_clc66d_final_sync.sql`.
 
 ```sql
 CREATE TABLE IF NOT EXISTS public."DS_wed_CLC66D_Midterm.csv" (
@@ -156,6 +164,8 @@ CREATE TABLE IF NOT EXISTS public."DS_wed_CLC66D_Midterm.csv" (
 
 **Mar12_K56:** `DS_Mar12_K56_Midterm.csv` / `DS_Mar12_K56_Final.csv` — cùng schema `Tên`, `MSV`, `Số câu đúng`, `Điểm`. Tạo/import/sync bằng `supabase_create_mar12_k56_*`, `supabase_import_mar12_k56_midterm.sql`, `supabase_mar12_k56_midterm_sync.sql` (INSERT `exam_responses` → cập nhật roster khi MSV khớp), `supabase_mar12_k56_final_sync.sql` (INSERT `final_exam_responses` → final roster). Roster nguồn CSV: `new_class/DS_Mar12_K56_Midterm.csv` (62 SV).
 
+**Sample (thử nghiệm):** `DS_Sample_Midterm.csv` / `DS_Sample_Final.csv` — 5 SV, MSV **99010001–99010005** (tránh trùng SV thật). Script: `supabase_create_sample_midterm_table.sql` → `supabase_import_sample_midterm.sql` → `supabase_sample_midterm_sync.sql` → `supabase_create_sample_final_table.sql` → `supabase_sample_final_sync.sql`. Roster: `new_class/DS_Sample_Midterm.csv`. Tra cứu trong app: lớp **Sample (thử nghiệm)**.
+
 **Exam version allocation (server):** `exam_version_counter` (singleton pointer), `exam_assignments` (`student_id` → `test_version`), function `assign_test_version(text)` — see `supabase_exam_version_allocator.sql`.
 
 **Legacy / other roster tables (may still exist in DB; not in current lookup dropdown):** e.g. `DS_Thurs _7_8_Midterm.csv`, `DS_Wed _5_6_Midterm.csv`, `DS_Fri_1_2_Midterm.csv` — same column shape where used historically. After running `supabase_rename_sun_to_mar3_k56_ktqd.sql`, the old names `DS_Sun_Midterm.csv` / `DS_Sun_Final.csv` **no longer exist** in Postgres (replaced by `DS_Mar3_K56_KTQD_*`). RLS patterns (`TO public` vs `TO anon, authenticated`) are equivalent for anon read when `USING (true)`; they do **not** explain score differences between browsers (cache/UI state does).
@@ -166,7 +176,7 @@ CREATE TABLE IF NOT EXISTS public."DS_wed_CLC66D_Midterm.csv" (
 2. In Supabase **SQL Editor**, run the full script [supabase_rename_sun_to_mar3_k56_ktqd.sql](supabase_rename_sun_to_mar3_k56_ktqd.sql) once. It is idempotent.
 3. Script ends with `NOTIFY pgrst, 'reload schema';` so PostgREST picks up renames immediately.
 4. Do **not** re-run legacy `supabase_sun_midterm_sync.sql` / `supabase_sun_final_sync.sql` against production after rename — they reference dropped `update_sun_*` objects; use the Mar3-named triggers installed by the migration.
-5. Smoke test: `ConnectionTest` on `/lookup` → all four tables **Connected**; submit a test `exam_responses` / `final_exam_responses` row and confirm the matching `DS_Mar3_K56_KTQD_*` row updates.
+5. Smoke test: `ConnectionTest` → **Mar3**, **Mar12**, **Sample** **Connected**; nộp bài với MSV Sample và xác nhận `DS_Sample_Final.csv` (hoặc midterm nếu test `exam_responses`).
 
 **Exam System Tables:**
 
@@ -194,7 +204,7 @@ CREATE TABLE IF NOT EXISTS public."DS_wed_CLC66D_Midterm.csv" (
 
 ### Score Lookup Page (src/app/lookup/page.tsx)
 - Form handling for student name and ID input
-- Class dropdown: **CLC66D** / **Mar3_K56_KTQD** / **Mar12_K56** → `TABLE_BY_TERM_CLASS` to roster table
+- Class dropdown: **CLC66D** / **Mar3_K56_KTQD** / **Mar12_K56** / **Sample (thử nghiệm)** → `TABLE_BY_TERM_CLASS`
 - Search strategies: exact trim, MSV as string, name `ilike`
 - Error handling and loading states; optional git SHA “Phiên bản” on page when env set
 - Responsive UI with TailwindCSS; browser autocomplete disabled
@@ -244,7 +254,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 - Prevents duplicate submissions
 
 ### Connection Test Component (src/components/ConnectionTest.tsx)
-- Tests 6 roster tables by exam term: adds `DS_Mar12_K56_Midterm.csv`, `DS_Mar12_K56_Final.csv` to the CLC66D / Mar3 pair above
+- Tests 8 roster tables (CLC66D + Mar3 + Mar12 + Sample × mid/final)
 - Error reporting for troubleshooting
 
 ## 🔄 Data flow: thi online → điểm trên roster → tra cứu
@@ -254,20 +264,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 1. **`/exam` (client):** SV nhập tên + MSV → `getExamResponse` kiểm tra `exam_responses` theo `student_id`; nếu đã có bản ghi thì chặn làm lại (một MSV toàn hệ thống, không tách lớp). **Đề 1–4:** RPC **`assign_test_version(p_student_id)`** (Postgres: round-robin toàn cục, mỗi MSV một đề cố định lần đầu; bảng `exam_assignments` / `exam_version_counter`). Sau đó `getTestVersion(version)` trong `examGenerator.ts`. Câu hỏi: `test_library_lec1_lec6.csv` → 4 bộ 40 câu + **xáo thứ tự 4 phương án A–D mỗi câu**. Nộp bài: `saveExamResponse` chấm 0.25/câu → **INSERT** `exam_responses` (`student_name`, `student_id`, `test_version`, `responses`, `total_score`).
 
 2. **PostgreSQL (tùy script đã chạy trên Supabase):** **AFTER INSERT** trên `exam_responses` có thể kích hoạt:
-   - `supabase_wed_clc66d_midterm_sync.sql` → cập nhật `DS_wed_CLC66D_Midterm.csv` khi MSV khớp (CLC66D).
+   - *(Tùy chọn, không ưu tiên)* `supabase_wed_clc66d_midterm_sync.sql` → cập nhật `DS_wed_CLC66D_Midterm.csv` — **CLC66D không thi trên nền tảng này**, có thể bỏ qua khi vận hành.
    - `supabase_rename_sun_to_mar3_k56_ktqd.sql` → trigger `update_mar3_k56_ktqd_midterm_from_exam_response` UPDATE dòng trong `DS_Mar3_K56_KTQD_Midterm.csv` khi `TRIM(MSV) = TRIM(student_id)` (Mar3_K56_KTQD). Trigger Sun cũ và bản sync cũ đã bị thay bằng migration này.
    - `supabase_mar12_k56_midterm_sync.sql` → `update_mar12_k56_midterm_from_exam_response` cập nhật `DS_Mar12_K56_Midterm.csv` khi MSV khớp (Mar12_K56).
+   - `supabase_sample_midterm_sync.sql` → `update_sample_midterm_from_exam_response` cập nhật `DS_Sample_Midterm.csv` khi MSV khớp (Sample).
    - (Tuỳ dự án cũ) `supabase_enable_auto_update.sql` → `DS_Fri_1_2_Midterm.csv`; các bảng Thứ 5 / Thứ 4 legacy **không** được app lookup hiện tại dùng.
 
-3. **`/lookup` (client):** Chọn **CLC66D**, **Mar3_K56_KTQD**, hoặc **Mar12_K56** → `TABLE_BY_TERM_CLASS` → `.select` các cột `Tên`, `MSV`, `Số câu đúng`, `Điểm` trên **đúng bảng roster**. **Không** merge `exam_responses`. `NULL`/rỗng → UI “Chưa công bố”; `0` hoặc `"0"` vẫn là điểm đã công bố.
+3. **`/lookup` (client):** Chọn lớp (Mar3 / Mar12 / Sample / tùy chọn CLC66D) → `TABLE_BY_TERM_CLASS` → `.select` `Tên`, `MSV`, `Số câu đúng`, `Điểm`. **Không** merge `exam_responses`. `NULL`/rỗng → “Chưa công bố”.
 
 4. **Final exam mode (`/exam`):** `generateFinalExam(studentId)` fetches `final_exam_all`, picks 40 questions with fixed per-lecture quotas (5/6/6/6/5/5/5/2), then shuffles answer options per question. Submission uses `saveFinalExamResponse` → **INSERT** `final_exam_responses` (`student_name`, `student_id`, `responses`, `total_score`, `num_correct`).
 
-5. **Final roster sync:** `AFTER INSERT` on `final_exam_responses` updates `DS_wed_CLC66D_Final.csv`, `DS_Mar3_K56_KTQD_Final.csv`, and (sau khi chạy script) `DS_Mar12_K56_Final.csv` through `supabase_wed_clc66d_final_sync.sql`, `supabase_rename_sun_to_mar3_k56_ktqd.sql` (Mar3 trigger), và `supabase_mar12_k56_final_sync.sql`.
+5. **Final roster sync:** `AFTER INSERT` on `final_exam_responses` cập nhật **`DS_Mar3_K56_KTQD_Final.csv`**, **`DS_Mar12_K56_Final.csv`**, **`DS_Sample_Final.csv`** (và CLC66D nếu còn trigger). Mỗi trigger chỉ `UPDATE` dòng có MSV khớp.
 
-6. **Lookup term switch:** `/lookup` now chooses table by `{examTerm, class}`:
-   - Midterm: `DS_wed_CLC66D_Midterm.csv`, `DS_Mar3_K56_KTQD_Midterm.csv`, `DS_Mar12_K56_Midterm.csv`
-   - Final: `DS_wed_CLC66D_Final.csv`, `DS_Mar3_K56_KTQD_Final.csv`, `DS_Mar12_K56_Final.csv`
+6. **Lookup term switch:** `/lookup` theo `{examTerm, class}` — thêm **`DS_Sample_Midterm.csv` / `DS_Sample_Final.csv`** cho lớp Sample.
 
 ## 🚀 Deployment Information
 
@@ -329,10 +338,10 @@ npm run lint         # Code linting
 ## 🔧 Recent Changes & Fixes
 
 ### Latest Updates
-1. **Lookup scope** - UI tra cứu **CLC66D** + **Mar3_K56_KTQD** + **Mar12_K56**; mapping tới 6 bảng roster (midterm/final × 3 lớp)
+1. **Lookup scope** - Thêm **Sample (thử nghiệm)**; Mar3 + Mar12 + Sample; CLC66D tùy chọn
 2. **Updated page title** - Changed browser tab to "NEU Class Manager" (simplified from "NEU Class Manager - Tra Cứu Điểm Thi")
 3. **Enhanced UI/UX** - Professional styling with gradients, shadows, and better typography
-4. **Connection testing** - ConnectionTest kiểm tra 6 bảng roster (3 lớp × Midterm / Final)
+4. **Connection testing** - ConnectionTest kiểm tra 8 bảng; test quy trình: Mar3 + Mar12 + Sample
 5. **Improved accessibility** - Added ARIA labels, keyboard navigation, and focus states
 6. **Enhanced results display** - Better visual hierarchy with card-based layout
 7. **Background image** - Added bg.jpg with 30% opacity overlay for better visibility
@@ -384,7 +393,7 @@ npm run lint         # Code linting
 
 ### ✅ Completed
 - Database connection established
-- Score lookup (CLC66D + Mar3_K56_KTQD + Mar12_K56) working after Supabase SQL for Mar12 is applied
+- Score lookup Mar3 + Mar12 + Sample (+ CLC66D tùy chọn) sau khi SQL Supabase áp dụng
 - Online exam system implemented
 - 4 test versions; server-side round-robin assignment via `assign_test_version`
 - Automatic grading system
@@ -429,9 +438,9 @@ npm run lint         # Code linting
 
 ### Database
 - **Supabase Project:** asxhozsfmlmsrflmzizr
-- **Lookup roster tables (app):**
-  - Midterm: `DS_wed_CLC66D_Midterm.csv`, `DS_Mar3_K56_KTQD_Midterm.csv`, `DS_Mar12_K56_Midterm.csv`
-  - Final: `DS_wed_CLC66D_Final.csv`, `DS_Mar3_K56_KTQD_Final.csv`, `DS_Mar12_K56_Final.csv`
+- **Lookup roster tables (app):** `DS_Mar3_K56_KTQD_*`, `DS_Mar12_K56_*`, `DS_Sample_*`; `DS_wed_CLC66D_*` tùy chọn
+  - Midterm: `DS_Mar3_K56_KTQD_Midterm.csv`, `DS_Mar12_K56_Midterm.csv`, `DS_Sample_Midterm.csv` (+ `DS_wed_CLC66D_Midterm.csv` nếu còn)
+  - Final: `DS_Mar3_K56_KTQD_Final.csv`, `DS_Mar12_K56_Final.csv`, `DS_Sample_Final.csv` (+ `DS_wed_CLC66D_Final.csv` nếu còn)
 - **Other roster tables:** may exist for legacy classes (e.g. Thurs/Wed/Fri CSV-named tables)
 - **Exam Tables:**
   - Midterm: `test_library_lec1_lec6.csv`, `exam_responses`; allocator: `exam_version_counter`, `exam_assignments`
@@ -457,6 +466,8 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### May 2026
+- **Lớp Sample (test):** `new_class/DS_Sample_Midterm.csv` — 5 SV (tên mẫu, MSV 99010001–99010005). SQL: `supabase_create_sample_midterm_table.sql`, `supabase_import_sample_midterm.sql`, `supabase_verify_sample_midterm.sql`, `supabase_sample_midterm_sync.sql`, `supabase_create_sample_final_table.sql`, `supabase_sample_final_sync.sql`. `lookup/page.tsx` + `ConnectionTest.tsx`: lớp **Sample (thử nghiệm)**. Thứ tự chạy trên Supabase giống Mar12.
+- **Chính sách CLC66D (tài liệu):** Ghi nhận **lớp CLC66D sẽ thi không qua nền tảng này** — **chưa cần** ưu tiên trigger/import/sync hay ConnectionTest cho `DS_wed_CLC66D_*` khi vận hành thi online; phạm vi vận hành **Mar3_K56_KTQD** + **Mar12_K56**. Cập nhật toàn bộ `backup-context.md` cho nhất quán.
 - **Mar12_K56 Supabase + app wiring (pushed `9ebd613`)**: Added roster tables pack — `supabase_create_mar12_k56_midterm_table.sql`, `supabase_import_mar12_k56_midterm.sql`, `supabase_verify_mar12_k56_midterm.sql`, `supabase_mar12_k56_midterm_sync.sql` (trigger on `exam_responses`), `supabase_create_mar12_k56_final_table.sql` (seeds `Tên`/`MSV` from midterm), `supabase_mar12_k56_final_sync.sql` (trigger on `final_exam_responses`). Source data: `new_class/DS_Mar12_K56_Midterm.csv` + `new_class/Kiem-tra-giua-ky-160936565697150978.xlsx` (62 students). Updated `src/app/lookup/page.tsx` (constants, `TABLE_BY_TERM_CLASS`, dropdown **Mar12_K56**), `src/components/ConnectionTest.tsx` (two more table checks), and this `backup-context.md`. **Ops order on Supabase:** (1) create midterm table → (2) import → (3) midterm sync → (4) create final table → (5) final sync. Vercel deploy từ `main` sau commit này; DB đã áp dụng theo xác nhận user.
 - **Sun → Mar3_K56_KTQD (pushed)**: Committed and pushed `235fff0` to `main` (Vercel auto-deploy). **DB step:** run `supabase_rename_sun_to_mar3_k56_ktqd.sql` in Supabase SQL Editor after deploy so table names match the app (see section **Supabase ops: Mar3_K56_KTQD rename** above).
 - **Sun → Mar3_K56_KTQD class rename**: Added `supabase_rename_sun_to_mar3_k56_ktqd.sql` (idempotent: rename `DS_Sun_Midterm.csv` → `DS_Mar3_K56_KTQD_Midterm.csv` and `DS_Sun_Final.csv` → `DS_Mar3_K56_KTQD_Final.csv`, rename PK constraints/indexes, recreate RLS policies, drop old `update_sun_*` functions/triggers, create `update_mar3_k56_ktqd_*` functions + triggers). Updated `src/app/lookup/page.tsx` (constants + dropdown option), `src/components/ConnectionTest.tsx` (display + table names) accordingly. Old SQL files (`supabase_sun_*.sql`) kept for history but no longer wired to runtime.
@@ -466,7 +477,7 @@ This backup context contains all essential information for AI sessions:
 - **Final roster tables + triggers (initial)**: Added `DS_wed_CLC66D_Final.csv` and `DS_Sun_Final.csv` (since renamed to `DS_Mar3_K56_KTQD_Final.csv` via migration) plus `supabase_wed_clc66d_final_sync.sql` / `supabase_sun_final_sync.sql`; Mar3 final sync is superseded by `supabase_rename_sun_to_mar3_k56_ktqd.sql` trigger `update_mar3_k56_ktqd_final_from_response`.
 - **Lookup multi-term support**: `src/app/lookup/page.tsx` now adds exam-term selector (Giữa kỳ/Cuối kỳ) and table mapping for all 4 roster tables. `src/components/ConnectionTest.tsx` now tests all 4 tables.
 - **Exam page final mode**: `src/app/exam/page.tsx` switched to final flow (`generateFinalExam`, `getFinalExamResponse`, `saveFinalExamResponse`) and no longer depends on `assign_test_version` for final exam assignment.
-- **backup-context.md refresh (historic note)**: Earlier refresh described lookup as CLC66D + Chủ nhật; current lookup is CLC66D + **Mar3_K56_KTQD** after rename migration + UI update.
+- **backup-context.md refresh (historic note)**: Earlier refresh described lookup as CLC66D + Chủ nhật; sau đổi tên Sun → **Mar3_K56_KTQD** và thêm Mar12, UI có thể vẫn liệt kê CLC66D nhưng **chính sách:** CLC66D không thi trên nền tảng (cập nhật May 2026 trong file này).
 
 ### March 2026
 - **Allocator operations note**: `exam_version_counter` stores the global “next version” pointer for RPC round-robin assignment. Do **not** delete singleton row `id=1` during normal operation. For a new exam cycle, reset with `UPDATE ... SET next_version = 1`; only clear `exam_assignments` if you intentionally want re-assignment for existing `student_id`s.
@@ -531,7 +542,7 @@ This backup context contains all essential information for AI sessions:
 - **Logo Integration**: Added NEU, NCT, and FDA logos to all pages, standardized sizes to 150x150
 - **Summary Table Auto-Update**: Enabled automatic trigger for `DS_Fri_1_2_Midterm.csv` table updates
 - **Exam System Refinements**: Reshuffled test bank, hid scores from students after submission
-- **Multi-Class Support (historic)**: Earlier builds added more class options; **current** lookup UI is CLC66D + Mar3_K56_KTQD only (label was “Chủ nhật” before May 2026 rename).
+- **Multi-Class Support (historic)**: Earlier builds added more class options; lookup UI hiện có thể gồm CLC66D + Mar3 + Mar12; **chính sách vận hành thi online:** ưu tiên Mar3 + Mar12; CLC66D không thi trên app.
 
 ---
 

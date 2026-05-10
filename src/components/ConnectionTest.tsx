@@ -23,9 +23,11 @@ export default function ConnectionTest() {
       { name: 'DS_wed_CLC66D_Midterm.csv', displayName: 'CLC66D', examTerm: 'Giữa kỳ' as const },
       { name: 'DS_Mar3_K56_KTQD_Midterm.csv', displayName: 'Mar3_K56_KTQD', examTerm: 'Giữa kỳ' as const },
       { name: 'DS_Mar12_K56_Midterm.csv', displayName: 'Mar12_K56', examTerm: 'Giữa kỳ' as const },
+      { name: 'DS_Sample_Midterm.csv', displayName: 'Sample', examTerm: 'Giữa kỳ' as const },
       { name: 'DS_wed_CLC66D_Final.csv', displayName: 'CLC66D', examTerm: 'Cuối kỳ' as const },
       { name: 'DS_Mar3_K56_KTQD_Final.csv', displayName: 'Mar3_K56_KTQD', examTerm: 'Cuối kỳ' as const },
-      { name: 'DS_Mar12_K56_Final.csv', displayName: 'Mar12_K56', examTerm: 'Cuối kỳ' as const }
+      { name: 'DS_Mar12_K56_Final.csv', displayName: 'Mar12_K56', examTerm: 'Cuối kỳ' as const },
+      { name: 'DS_Sample_Final.csv', displayName: 'Sample', examTerm: 'Cuối kỳ' as const }
     ]
 
     const results: TableTestResult[] = []
