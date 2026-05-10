@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** May 10, 2026 (Sunday class renamed to Mar3_K56_KTQD — DB + UI)
+**Last Updated:** May 10, 2026 (Mar3_K56_KTQD: migration doc + changelog cleanup; Git `235fff0` on `main`)
 
 ## 🎯 Core Features
 
@@ -149,7 +149,15 @@ CREATE TABLE IF NOT EXISTS public."DS_wed_CLC66D_Midterm.csv" (
 
 **Exam version allocation (server):** `exam_version_counter` (singleton pointer), `exam_assignments` (`student_id` → `test_version`), function `assign_test_version(text)` — see `supabase_exam_version_allocator.sql`.
 
-**Legacy / other roster tables (may still exist in DB; not in current lookup dropdown):** e.g. `DS_Thurs _7_8_Midterm.csv`, `DS_Wed _5_6_Midterm.csv`, `DS_Fri_1_2_Midterm.csv` — same column shape where used historically. RLS patterns (`TO public` vs `TO anon, authenticated`) are equivalent for anon read when `USING (true)`; they do **not** explain score differences between browsers (cache/UI state does).
+**Legacy / other roster tables (may still exist in DB; not in current lookup dropdown):** e.g. `DS_Thurs _7_8_Midterm.csv`, `DS_Wed _5_6_Midterm.csv`, `DS_Fri_1_2_Midterm.csv` — same column shape where used historically. After running `supabase_rename_sun_to_mar3_k56_ktqd.sql`, the old names `DS_Sun_Midterm.csv` / `DS_Sun_Final.csv` **no longer exist** in Postgres (replaced by `DS_Mar3_K56_KTQD_*`). RLS patterns (`TO public` vs `TO anon, authenticated`) are equivalent for anon read when `USING (true)`; they do **not** explain score differences between browsers (cache/UI state does).
+
+### Supabase ops: Mar3_K56_KTQD rename (one-time)
+
+1. Deploy app first (commit `235fff0` or newer) so `/lookup` and `ConnectionTest` call the new table names.
+2. In Supabase **SQL Editor**, run the full script [supabase_rename_sun_to_mar3_k56_ktqd.sql](supabase_rename_sun_to_mar3_k56_ktqd.sql) once. It is idempotent.
+3. Script ends with `NOTIFY pgrst, 'reload schema';` so PostgREST picks up renames immediately.
+4. Do **not** re-run legacy `supabase_sun_midterm_sync.sql` / `supabase_sun_final_sync.sql` against production after rename — they reference dropped `update_sun_*` objects; use the Mar3-named triggers installed by the migration.
+5. Smoke test: `ConnectionTest` on `/lookup` → all four tables **Connected**; submit a test `exam_responses` / `final_exam_responses` row and confirm the matching `DS_Mar3_K56_KTQD_*` row updates.
 
 **Exam System Tables:**
 
@@ -439,14 +447,15 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### May 2026
+- **Sun → Mar3_K56_KTQD (pushed)**: Committed and pushed `235fff0` to `main` (Vercel auto-deploy). **DB step:** run `supabase_rename_sun_to_mar3_k56_ktqd.sql` in Supabase SQL Editor after deploy so table names match the app (see section **Supabase ops: Mar3_K56_KTQD rename** above).
 - **Sun → Mar3_K56_KTQD class rename**: Added `supabase_rename_sun_to_mar3_k56_ktqd.sql` (idempotent: rename `DS_Sun_Midterm.csv` → `DS_Mar3_K56_KTQD_Midterm.csv` and `DS_Sun_Final.csv` → `DS_Mar3_K56_KTQD_Final.csv`, rename PK constraints/indexes, recreate RLS policies, drop old `update_sun_*` functions/triggers, create `update_mar3_k56_ktqd_*` functions + triggers). Updated `src/app/lookup/page.tsx` (constants + dropdown option), `src/components/ConnectionTest.tsx` (display + table names) accordingly. Old SQL files (`supabase_sun_*.sql`) kept for history but no longer wired to runtime.
 - **Production push (final exam)**: Committed and pushed `e129d94` to `main`; Vercel auto-deploy expected from this commit.
 - **Exam UI clarification**: Final-exam template intentionally does not show “Đề thi số X” (version 1–4) because final mode uses seeded per-student stratified selection instead of discrete test-version buckets.
 - **Final exam stratified rollout**: Implemented final-exam generation from `final_exam_all` with fixed lecture quotas `{Lec1:5, Lec2:6, Lec3:6, Lec4:6, Lec5:5, Lec6:5, Lec7:5, Lec8:2}`, deterministic per-student seed (`seedFromStudentId` + `FINAL_EXAM_SALT`), and separated write path to `final_exam_responses`.
-- **Final roster tables + triggers**: Added `DS_wed_CLC66D_Final.csv`, `DS_Sun_Final.csv`, plus sync scripts `supabase_wed_clc66d_final_sync.sql` / `supabase_sun_final_sync.sql` to project final score onto roster tables after submit.
+- **Final roster tables + triggers (initial)**: Added `DS_wed_CLC66D_Final.csv` and `DS_Sun_Final.csv` (since renamed to `DS_Mar3_K56_KTQD_Final.csv` via migration) plus `supabase_wed_clc66d_final_sync.sql` / `supabase_sun_final_sync.sql`; Mar3 final sync is superseded by `supabase_rename_sun_to_mar3_k56_ktqd.sql` trigger `update_mar3_k56_ktqd_final_from_response`.
 - **Lookup multi-term support**: `src/app/lookup/page.tsx` now adds exam-term selector (Giữa kỳ/Cuối kỳ) and table mapping for all 4 roster tables. `src/components/ConnectionTest.tsx` now tests all 4 tables.
 - **Exam page final mode**: `src/app/exam/page.tsx` switched to final flow (`generateFinalExam`, `getFinalExamResponse`, `saveFinalExamResponse`) and no longer depends on `assign_test_version` for final exam assignment.
-- **backup-context.md refresh**: Đồng bộ mô tả với code — tra cứu 2 lớp (CLC66D, Chủ nhật); luồng thi dùng RPC `assign_test_version`; schema ưu tiên `DS_wed_CLC66D_Midterm.csv`; ghi chú bảng legacy và `testVersionFromStudentId` không còn dùng trên `/exam`.
+- **backup-context.md refresh (historic note)**: Earlier refresh described lookup as CLC66D + Chủ nhật; current lookup is CLC66D + **Mar3_K56_KTQD** after rename migration + UI update.
 
 ### March 2026
 - **Allocator operations note**: `exam_version_counter` stores the global “next version” pointer for RPC round-robin assignment. Do **not** delete singleton row `id=1` during normal operation. For a new exam cycle, reset with `UPDATE ... SET next_version = 1`; only clear `exam_assignments` if you intentionally want re-assignment for existing `student_id`s.
@@ -511,7 +520,7 @@ This backup context contains all essential information for AI sessions:
 - **Logo Integration**: Added NEU, NCT, and FDA logos to all pages, standardized sizes to 150x150
 - **Summary Table Auto-Update**: Enabled automatic trigger for `DS_Fri_1_2_Midterm.csv` table updates
 - **Exam System Refinements**: Reshuffled test bank, hid scores from students after submission
-- **Multi-Class Support (historic)**: Earlier builds added more class options; **current** lookup UI is CLC66D + Chủ nhật only.
+- **Multi-Class Support (historic)**: Earlier builds added more class options; **current** lookup UI is CLC66D + Mar3_K56_KTQD only (label was “Chủ nhật” before May 2026 rename).
 
 ---
 
