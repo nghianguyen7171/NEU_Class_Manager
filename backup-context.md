@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** A comprehensive web application for managing classes and conducting midterm exams at NEU. Features include score lookup, online exam taking, and automatic grading.  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** May 10, 2026 (Mar12_K56: Supabase roster pack + lookup/ConnectionTest; deploy then run SQL on Supabase)
+**Last Updated:** May 10, 2026 (Mar12_K56: pushed to `main` as `9ebd613`; Supabase SQL đã chạy trên production)
 
 ## 🎯 Core Features
 
@@ -457,7 +457,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### May 2026
-- **Mar12_K56 Supabase + app wiring**: Added roster tables pack — `supabase_create_mar12_k56_midterm_table.sql`, `supabase_import_mar12_k56_midterm.sql`, `supabase_verify_mar12_k56_midterm.sql`, `supabase_mar12_k56_midterm_sync.sql` (trigger on `exam_responses`), `supabase_create_mar12_k56_final_table.sql` (seeds `Tên`/`MSV` from midterm), `supabase_mar12_k56_final_sync.sql` (trigger on `final_exam_responses`). Source data: `new_class/DS_Mar12_K56_Midterm.csv` (62 students). Updated `src/app/lookup/page.tsx` (constants, `TABLE_BY_TERM_CLASS`, dropdown **Mar12_K56**), `src/components/ConnectionTest.tsx` (two more table checks), and this `backup-context.md`. **Ops order on Supabase:** (1) create midterm table → (2) import → (3) midterm sync → (4) create final table → (5) final sync. Deploy app before expecting lookup/ConnectionTest to succeed for new tables.
+- **Mar12_K56 Supabase + app wiring (pushed `9ebd613`)**: Added roster tables pack — `supabase_create_mar12_k56_midterm_table.sql`, `supabase_import_mar12_k56_midterm.sql`, `supabase_verify_mar12_k56_midterm.sql`, `supabase_mar12_k56_midterm_sync.sql` (trigger on `exam_responses`), `supabase_create_mar12_k56_final_table.sql` (seeds `Tên`/`MSV` from midterm), `supabase_mar12_k56_final_sync.sql` (trigger on `final_exam_responses`). Source data: `new_class/DS_Mar12_K56_Midterm.csv` + `new_class/Kiem-tra-giua-ky-160936565697150978.xlsx` (62 students). Updated `src/app/lookup/page.tsx` (constants, `TABLE_BY_TERM_CLASS`, dropdown **Mar12_K56**), `src/components/ConnectionTest.tsx` (two more table checks), and this `backup-context.md`. **Ops order on Supabase:** (1) create midterm table → (2) import → (3) midterm sync → (4) create final table → (5) final sync. Vercel deploy từ `main` sau commit này; DB đã áp dụng theo xác nhận user.
 - **Sun → Mar3_K56_KTQD (pushed)**: Committed and pushed `235fff0` to `main` (Vercel auto-deploy). **DB step:** run `supabase_rename_sun_to_mar3_k56_ktqd.sql` in Supabase SQL Editor after deploy so table names match the app (see section **Supabase ops: Mar3_K56_KTQD rename** above).
 - **Sun → Mar3_K56_KTQD class rename**: Added `supabase_rename_sun_to_mar3_k56_ktqd.sql` (idempotent: rename `DS_Sun_Midterm.csv` → `DS_Mar3_K56_KTQD_Midterm.csv` and `DS_Sun_Final.csv` → `DS_Mar3_K56_KTQD_Final.csv`, rename PK constraints/indexes, recreate RLS policies, drop old `update_sun_*` functions/triggers, create `update_mar3_k56_ktqd_*` functions + triggers). Updated `src/app/lookup/page.tsx` (constants + dropdown option), `src/components/ConnectionTest.tsx` (display + table names) accordingly. Old SQL files (`supabase_sun_*.sql`) kept for history but no longer wired to runtime.
 - **Production push (final exam)**: Committed and pushed `e129d94` to `main`; Vercel auto-deploy expected from this commit.
