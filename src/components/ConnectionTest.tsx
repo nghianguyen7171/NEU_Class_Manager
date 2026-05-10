@@ -21,9 +21,9 @@ export default function ConnectionTest() {
     
     const tablesToTest = [
       { name: 'DS_wed_CLC66D_Midterm.csv', displayName: 'CLC66D', examTerm: 'Giữa kỳ' as const },
-      { name: 'DS_Sun_Midterm.csv', displayName: 'Chủ nhật', examTerm: 'Giữa kỳ' as const },
+      { name: 'DS_Mar3_K56_KTQD_Midterm.csv', displayName: 'Mar3_K56_KTQD', examTerm: 'Giữa kỳ' as const },
       { name: 'DS_wed_CLC66D_Final.csv', displayName: 'CLC66D', examTerm: 'Cuối kỳ' as const },
-      { name: 'DS_Sun_Final.csv', displayName: 'Chủ nhật', examTerm: 'Cuối kỳ' as const }
+      { name: 'DS_Mar3_K56_KTQD_Final.csv', displayName: 'Mar3_K56_KTQD', examTerm: 'Cuối kỳ' as const }
     ]
 
     const results: TableTestResult[] = []
