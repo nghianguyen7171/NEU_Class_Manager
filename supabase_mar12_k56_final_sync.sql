@@ -19,7 +19,7 @@ $$;
 
 DROP TRIGGER IF EXISTS trigger_mar12_k56_final_on_exam ON public.final_exam_responses;
 CREATE TRIGGER trigger_mar12_k56_final_on_exam
-AFTER INSERT ON public.final_exam_responses
+AFTER INSERT OR UPDATE ON public.final_exam_responses
 FOR EACH ROW
 EXECUTE FUNCTION public.update_mar12_k56_final_from_response();
 

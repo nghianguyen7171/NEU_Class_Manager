@@ -125,9 +125,9 @@ export async function saveFinalExamResponse(
       num_correct: numCorrect
     }
 
-    const { error } = await supabase
-      .from('final_exam_responses')
-      .insert(responseData)
+    const { error } = await supabase.from('final_exam_responses').upsert(responseData, {
+      onConflict: 'student_id'
+    })
 
     if (error) {
       console.error('Error saving final exam response:', error)

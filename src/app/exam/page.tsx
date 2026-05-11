@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { generateFinalExam } from '@/lib/examGenerator'
-import { saveFinalExamResponse, getFinalExamResponse } from '@/lib/examStorage'
+import { saveFinalExamResponse } from '@/lib/examStorage'
 import type { ShuffledQuestion } from '@/lib/types'
 
 export default function ExamPage() {
@@ -29,22 +29,8 @@ export default function ExamPage() {
       return
     }
 
-    // Check if student has already taken the exam
     setLoading(true)
     setError('')
-    
-    try {
-      const existingResponse = await getFinalExamResponse(studentId.trim())
-      
-      if (existingResponse) {
-        setError('Bạn đã hoàn thành bài kiểm tra rồi!')
-        setLoading(false)
-        return
-      }
-    } catch (err) {
-      console.error('Error checking existing response:', err)
-      // Continue anyway
-    }
 
     try {
       const testQuestions = await generateFinalExam(studentId.trim())
@@ -218,7 +204,7 @@ export default function ExamPage() {
                   
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm text-blue-800">
-                      <strong>Lưu ý:</strong> Bạn chỉ có một lần làm bài duy nhất. Vui lòng hoàn thành tất cả 40 câu hỏi trước khi nộp bài.
+                      <strong>Lưu ý:</strong> Bạn có thể làm và nộp bài nhiều lần; <strong>điểm lưu trên hệ thống là lần nộp gần nhất</strong>. Hãy hoàn thành 40 câu trước khi nộp.
                     </p>
                   </div>
                   
@@ -337,7 +323,7 @@ export default function ExamPage() {
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
                 <p className="text-sm text-amber-800">
-                  <strong>Lưu ý:</strong> Vui lòng kiểm tra lại các câu trả lời trước khi nộp bài. Sau khi nộp bài, bạn không thể chỉnh sửa.
+                  <strong>Lưu ý:</strong> Kiểm tra lại trước khi nộp. Sau khi nộp, bạn có thể làm lại từ đầu; điểm công bố theo lần nộp mới nhất.
                 </p>
               </div>
               
@@ -407,9 +393,24 @@ export default function ExamPage() {
             
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-800 text-center font-medium">
-                Bài làm của bạn đã được lưu vào hệ thống. Kết quả sẽ được công bố sau.
+                Bài làm đã được lưu. Bạn có thể làm lại; điểm trên bảng lớp cập nhật theo lần nộp gần nhất.
               </p>
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setExamSubmitted(false)
+                setExamStarted(false)
+                setQuestions([])
+                setStudentAnswers({})
+                setTotalScore(0)
+                setError('')
+              }}
+              className="block w-full mb-3 bg-white border-2 border-indigo-600 text-indigo-700 py-3 px-6 rounded-lg font-semibold text-center hover:bg-indigo-50 transition-all duration-200"
+            >
+              Làm lại bài kiểm tra
+            </button>
             
             <Link
               href="/"

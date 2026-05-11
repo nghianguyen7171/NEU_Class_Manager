@@ -5,7 +5,7 @@
 **Project Name:** NEU Class Manager  
 **Purpose:** Web app tra cứu điểm và thi online (ưu tiên **Mar3_K56_KTQD**, **Mar12_K56**). **Sample** = roster 5 SV + bảng/trigger như Mar (chỉ để thử quy trình). **CLC66D không thi qua app này** (xem Core Features).  
 **Status:** ✅ Production Ready & Deployed  
-**Last Updated:** May 10, 2026 (Sample class đã push `main` — `11c8f9a`; SQL Supabase đã chạy theo xác nhận user)
+**Last Updated:** May 10, 2026 (Final exam làm lại + upsert; SQL `supabase_final_exam_allow_multiple_attempts.sql` đã chạy trên Supabase — xác nhận user)
 
 ## 🎯 Core Features
 
@@ -23,7 +23,7 @@
 - ℹ️ **Phạm vi lớp:** Luồng `/exam` + `exam_responses` / `final_exam_responses` + trigger roster — **Mar3_K56_KTQD**, **Mar12_K56**, và **Sample** (MSV 99010001–99010005 để test). **CLC66D** không thi qua app.
 - ✅ Four fixed 40-question sets from 87-question bank; **per-question** shuffle of four choices with deterministic seed (`examGenerator.ts` — labels A–D apply to positions after shuffle)
 - ✅ 4 test versions; assignment via Supabase RPC **`assign_test_version(p_student_id)`** — global round-robin `1→2→3→4→1` with **one fixed version per MSV** (tables `exam_assignments`, `exam_version_counter`; see `supabase_exam_version_allocator.sql`)
-- ✅ One row per MSV in `exam_responses` enforced at start (`getExamResponse`)
+- ✅ Giữa kỳ (legacy `exam_responses`): có thể vẫn **INSERT** nhiều dòng / logic cũ tùy triển khai. **Cuối kỳ (`final_exam_responses`):** **một dòng / MSV**, cập nhật bằng **upsert** khi SV làm lại
 - ✅ Automatic scoring (0.25 points per correct answer)
 - ✅ Response storage with detailed tracking in `exam_responses`
 - ℹ️ `testVersionFromStudentId()` remains in `examGenerator.ts` for reference/scripts; **`/exam` does not use it** for version selection.
@@ -110,6 +110,7 @@
 ├── supabase_sun_midterm_sync.sql # Legacy: Sunday roster sync (replaced by rename migration)
 ├── supabase_create_final_exam_all.sql
 ├── supabase_create_final_exam_responses.sql
+├── supabase_final_exam_allow_multiple_attempts.sql  # RLS UPDATE + triggers INSERT OR UPDATE (DB hiện có)
 ├── supabase_create_wed_clc66d_final_table.sql
 ├── supabase_create_sun_final_table.sql # Legacy: created old DS_Sun_Final.csv (now renamed)
 ├── supabase_wed_clc66d_final_sync.sql
@@ -248,10 +249,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 - Uses seedrandom for deterministic randomization
 
 ### Exam Storage (src/lib/examStorage.ts)
-- Saves student responses to Supabase
+- Saves final exam via **`upsert`** vào `final_exam_responses` (`onConflict: 'student_id'`) — SV có thể làm lại; mỗi MSV một dòng, ghi đè theo lần nộp mới nhất
 - Calculates scores automatically
 - Stores detailed question-level data
-- Prevents duplicate submissions
 
 ### Connection Test Component (src/components/ConnectionTest.tsx)
 - Tests 8 roster tables (CLC66D + Mar3 + Mar12 + Sample × mid/final)
@@ -272,9 +272,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 3. **`/lookup` (client):** Chọn lớp (Mar3 / Mar12 / Sample / tùy chọn CLC66D) → `TABLE_BY_TERM_CLASS` → `.select` `Tên`, `MSV`, `Số câu đúng`, `Điểm`. **Không** merge `exam_responses`. `NULL`/rỗng → “Chưa công bố”.
 
-4. **Final exam mode (`/exam`):** `generateFinalExam(studentId)` fetches `final_exam_all`, picks 40 questions with fixed per-lecture quotas (5/6/6/6/5/5/5/2), then shuffles answer options per question. Submission uses `saveFinalExamResponse` → **INSERT** `final_exam_responses` (`student_name`, `student_id`, `responses`, `total_score`, `num_correct`).
+4. **Final exam mode (`/exam`):** `generateFinalExam(studentId)` … Submission: `saveFinalExamResponse` → **`upsert`** `final_exam_responses` theo `student_id` (ghi đè bài cũ). Cần RLS **UPDATE** + trigger **`AFTER INSERT OR UPDATE`** trên `final_exam_responses` (xem `supabase_final_exam_allow_multiple_attempts.sql` hoặc các file `*_final_sync.sql` đã cập nhật).
 
-5. **Final roster sync:** `AFTER INSERT` on `final_exam_responses` cập nhật **`DS_Mar3_K56_KTQD_Final.csv`**, **`DS_Mar12_K56_Final.csv`**, **`DS_Sample_Final.csv`** (và CLC66D nếu còn trigger). Mỗi trigger chỉ `UPDATE` dòng có MSV khớp.
+5. **Final roster sync:** Trigger trên `final_exam_responses` (**INSERT hoặc UPDATE**) cập nhật roster final (Mar3 / Mar12 / Sample / CLC66D tùy cài) theo MSV khớp.
 
 6. **Lookup term switch:** `/lookup` theo `{examTerm, class}` — thêm **`DS_Sample_Midterm.csv` / `DS_Sample_Final.csv`** cho lớp Sample.
 
@@ -466,6 +466,7 @@ This backup context contains all essential information for AI sessions:
 ## 📝 Change Log
 
 ### May 2026
+- **Final exam — nhiều lần / ghi đè:** `saveFinalExamResponse` upsert `final_exam_responses` (`onConflict: student_id`). `/exam` bỏ chặn đã nộp, nút làm lại, copy UI. `supabase_create_final_exam_responses.sql`: RLS UPDATE + GRANT. Trigger final roster: `AFTER INSERT OR UPDATE` (Mar12, Sample, Wed CLC66D, Mar3 trong rename, Sun legacy). Script gộp DB hiện có: `supabase_final_exam_allow_multiple_attempts.sql` (đã chạy trên Supabase).
 - **Lớp Sample (test, pushed `11c8f9a`):** `new_class/DS_Sample_Midterm.csv` — 5 SV (tên mẫu, MSV 99010001–99010005). SQL: `supabase_create_sample_midterm_table.sql`, `supabase_import_sample_midterm.sql`, `supabase_verify_sample_midterm.sql`, `supabase_sample_midterm_sync.sql`, `supabase_create_sample_final_table.sql`, `supabase_sample_final_sync.sql`. `lookup/page.tsx` + `ConnectionTest.tsx`: lớp **Sample (thử nghiệm)**. Thứ tự chạy trên Supabase giống Mar12.
 - **Chính sách CLC66D (tài liệu):** Ghi nhận **lớp CLC66D sẽ thi không qua nền tảng này** — **chưa cần** ưu tiên trigger/import/sync hay ConnectionTest cho `DS_wed_CLC66D_*` khi vận hành thi online; phạm vi vận hành **Mar3_K56_KTQD** + **Mar12_K56**. Cập nhật toàn bộ `backup-context.md` cho nhất quán.
 - **Mar12_K56 Supabase + app wiring (pushed `9ebd613`)**: Added roster tables pack — `supabase_create_mar12_k56_midterm_table.sql`, `supabase_import_mar12_k56_midterm.sql`, `supabase_verify_mar12_k56_midterm.sql`, `supabase_mar12_k56_midterm_sync.sql` (trigger on `exam_responses`), `supabase_create_mar12_k56_final_table.sql` (seeds `Tên`/`MSV` from midterm), `supabase_mar12_k56_final_sync.sql` (trigger on `final_exam_responses`). Source data: `new_class/DS_Mar12_K56_Midterm.csv` + `new_class/Kiem-tra-giua-ky-160936565697150978.xlsx` (62 students). Updated `src/app/lookup/page.tsx` (constants, `TABLE_BY_TERM_CLASS`, dropdown **Mar12_K56**), `src/components/ConnectionTest.tsx` (two more table checks), and this `backup-context.md`. **Ops order on Supabase:** (1) create midterm table → (2) import → (3) midterm sync → (4) create final table → (5) final sync. Vercel deploy từ `main` sau commit này; DB đã áp dụng theo xác nhận user.
@@ -476,7 +477,8 @@ This backup context contains all essential information for AI sessions:
 - **Final exam stratified rollout**: Implemented final-exam generation from `final_exam_all` with fixed lecture quotas `{Lec1:5, Lec2:6, Lec3:6, Lec4:6, Lec5:5, Lec6:5, Lec7:5, Lec8:2}`, deterministic per-student seed (`seedFromStudentId` + `FINAL_EXAM_SALT`), and separated write path to `final_exam_responses`.
 - **Final roster tables + triggers (initial)**: Added `DS_wed_CLC66D_Final.csv` and `DS_Sun_Final.csv` (since renamed to `DS_Mar3_K56_KTQD_Final.csv` via migration) plus `supabase_wed_clc66d_final_sync.sql` / `supabase_sun_final_sync.sql`; Mar3 final sync is superseded by `supabase_rename_sun_to_mar3_k56_ktqd.sql` trigger `update_mar3_k56_ktqd_final_from_response`.
 - **Lookup multi-term support**: `src/app/lookup/page.tsx` now adds exam-term selector (Giữa kỳ/Cuối kỳ) and table mapping for all 4 roster tables. `src/components/ConnectionTest.tsx` now tests all 4 tables.
-- **Exam page final mode**: `src/app/exam/page.tsx` switched to final flow (`generateFinalExam`, `getFinalExamResponse`, `saveFinalExamResponse`) and no longer depends on `assign_test_version` for final exam assignment.
+- **Exam page final mode**: `src/app/exam/page.tsx` switched to final flow (`generateFinalExam`, `saveFinalExamResponse`) and no longer depends on `assign_test_version` for final exam assignment.
+- **Final exam — làm lại nhiều lần:** `saveFinalExamResponse` dùng **upsert** (`student_id`). RLS `UPDATE` + trigger **`AFTER INSERT OR UPDATE`** trên các `*_final_sync.sql` và script gộp `supabase_final_exam_allow_multiple_attempts.sql` (chạy trên Supabase nếu DB cũ). `/exam`: bỏ chặn “đã làm bài”, thêm nút **Làm lại bài kiểm tra**.
 - **backup-context.md refresh (historic note)**: Earlier refresh described lookup as CLC66D + Chủ nhật; sau đổi tên Sun → **Mar3_K56_KTQD** và thêm Mar12, UI có thể vẫn liệt kê CLC66D nhưng **chính sách:** CLC66D không thi trên nền tảng (cập nhật May 2026 trong file này).
 
 ### March 2026

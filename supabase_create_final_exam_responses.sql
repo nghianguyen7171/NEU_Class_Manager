@@ -1,5 +1,5 @@
 -- Final exam submissions table
--- One submission per student_id
+-- UNIQUE(student_id): app upserts — mỗi MSV một dòng, cập nhật khi làm lại
 
 CREATE TABLE IF NOT EXISTS public.final_exam_responses (
   id bigserial PRIMARY KEY,
@@ -27,8 +27,16 @@ CREATE POLICY "Allow read final exam responses"
   TO anon, authenticated
   USING (true);
 
+DROP POLICY IF EXISTS "Allow update final exam responses" ON public.final_exam_responses;
+CREATE POLICY "Allow update final exam responses"
+  ON public.final_exam_responses
+  FOR UPDATE
+  TO anon, authenticated
+  USING (true)
+  WITH CHECK (true);
+
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT SELECT, INSERT ON public.final_exam_responses TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.final_exam_responses TO anon, authenticated;
 GRANT USAGE, SELECT ON SEQUENCE public.final_exam_responses_id_seq TO anon, authenticated;
 
 COMMENT ON TABLE public.final_exam_responses

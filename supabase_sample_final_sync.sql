@@ -17,11 +17,11 @@
   END;
   $$;
 
-  DROP TRIGGER IF EXISTS trigger_sample_final_on_exam ON public.final_exam_responses;
-  CREATE TRIGGER trigger_sample_final_on_exam
-  AFTER INSERT ON public.final_exam_responses
-  FOR EACH ROW
-  EXECUTE FUNCTION public.update_sample_final_from_response();
+DROP TRIGGER IF EXISTS trigger_sample_final_on_exam ON public.final_exam_responses;
+CREATE TRIGGER trigger_sample_final_on_exam
+AFTER INSERT OR UPDATE ON public.final_exam_responses
+FOR EACH ROW
+EXECUTE FUNCTION public.update_sample_final_from_response();
 
   WITH latest AS (
     SELECT DISTINCT ON (student_id)
